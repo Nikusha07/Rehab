@@ -3,6 +3,7 @@ import "./globals.css";
 import "./polish.css";
 import "./typography.css";
 import "./map.css";
+import "./public-extras.css";
 import "./admin-contrast.css";
 import "./admin-suite.css";
 
