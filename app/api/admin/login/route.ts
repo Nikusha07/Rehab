@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminCookie, createAdminToken, isValidAdminCredentials } from "@/lib/auth";
+import { adminCookie, authenticateAdminCredentials, createAdminToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const username = String(body.username || "");
   const password = String(body.password || "");
-  if (!(await isValidAdminCredentials(username, password))) {
+  const account = await authenticateAdminCredentials(username, password);
+  if (!account) {
     return NextResponse.json({ ok: false, message: "მომხმარებელი ან პაროლი არასწორია." }, { status: 401 });
   }
-  const token = await createAdminToken(username);
-  const response = NextResponse.json({ ok: true });
+  const token = await createAdminToken(account.username, account.accessRole);
+  const response = NextResponse.json({ ok: true, role: account.accessRole });
   response.cookies.set(adminCookie, token, {
     httpOnly: true,
     sameSite: "lax",
