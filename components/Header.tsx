@@ -6,22 +6,30 @@ import { useState } from "react";
 export default function Header() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+
   return (
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="#top" onClick={close} aria-label="მთავარი გვერდი">
-          <Image
-            src="/logo.png"
-            alt="Rehab Center — რეაბილიტაციის ცენტრი"
-            width={210}
-            height={70}
-            priority
-            style={{ width: "clamp(168px, 18vw, 220px)", height: "auto", objectFit: "contain" }}
-          />
+          <span className="brand-logo">
+            <Image
+              src="/logo-symbol.png"
+              alt="Rehab Center"
+              width={46}
+              height={52}
+              priority
+            />
+          </span>
+          <span className="brand-copy">
+            <strong>Rehab Center</strong>
+            <small>რეაბილიტაციის ცენტრი</small>
+          </span>
         </a>
+
         <button className="menu-button" aria-expanded={open} aria-controls="main-nav" onClick={() => setOpen((v) => !v)}>
           <span></span><span></span><span></span><span className="sr-only">მენიუ</span>
         </button>
+
         <nav id="main-nav" className={`main-nav ${open ? "is-open" : ""}`}>
           <a href="#services" onClick={close}>სერვისები</a>
           <a href="#about" onClick={close}>ჩვენ შესახებ</a>
