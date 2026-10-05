@@ -12,6 +12,7 @@ const schema=z.object({
   bio:z.string().trim().max(2000).optional().default(""),
   image:z.string().trim().max(500).optional().default(""),
   isActive:z.boolean().optional().default(true),
+  showOnWebsite:z.boolean().optional().default(false),
   sortOrder:z.coerce.number().int().min(0).max(999).optional().default(0),
 });
 async function ok(request:NextRequest){return verifyAdminToken(request.cookies.get(adminCookie)?.value);}
