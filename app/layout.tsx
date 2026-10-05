@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./polish.css";
 import "./typography.css";
+import "./map.css";
 
 export const metadata: Metadata = {
   title: "რეაბილიტაციის ცენტრი | ონლაინ ჩაწერა",
