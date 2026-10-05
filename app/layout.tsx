@@ -3,6 +3,7 @@ import "./globals.css";
 import "./polish.css";
 import "./typography.css";
 import "./map.css";
+import "./admin-contrast.css";
 
 export const metadata: Metadata = {
   title: "რეაბილიტაციის ცენტრი | ონლაინ ჩაწერა",
