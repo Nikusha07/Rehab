@@ -59,6 +59,8 @@ Booking-ის შექმნა MongoDB transaction-ს იყენებს.
 4. Deploy.
 5. საჭიროების შემთხვევაში მიაბით custom domain.
 
+> Production deployment uses Vercel Environment Variables; keep secrets out of Git.
+
 ## ამ MVP-ში უკვე არის
 
 - სრულად responsive ახალი მთავარი გვერდი
