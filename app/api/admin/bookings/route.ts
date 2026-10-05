@@ -13,10 +13,16 @@ export async function GET(request: NextRequest) {
 
   try {
     await dbConnect();
+    const from = request.nextUrl.searchParams.get("from");
+    const to = request.nextUrl.searchParams.get("to");
+    const status = request.nextUrl.searchParams.get("status");
+    const filter: Record<string, unknown> = {};
+    if (from || to) filter.date = { ...(from ? { $gte: from } : {}), ...(to ? { $lte: to } : {}) };
+    if (status && ["confirmed","completed","cancelled","no_show"].includes(status)) filter.status = status;
 
-    const items = await Booking.find({})
+    const items = await Booking.find(filter)
       .sort({ date: -1, time: -1 })
-      .limit(250)
+      .limit(from || to ? 1000 : 250)
       .populate({ path: "serviceId", select: "name", model: Service })
       .populate({ path: "specialistId", select: "name title", model: Specialist })
       .lean();
@@ -24,9 +30,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true, items });
   } catch (error) {
     console.error("Admin bookings load failed:", error);
-    return NextResponse.json(
-      { ok: false, error: "Failed to load bookings" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: "Failed to load bookings" }, { status: 500 });
   }
 }
