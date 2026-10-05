@@ -10,8 +10,14 @@ export default function Header() {
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="#top" onClick={close} aria-label="მთავარი გვერდი">
-          <span className="brand-logo"><Image src="/logo-symbol.png" alt="რეაბილიტაციის ცენტრი" width={54} height={62} priority /></span>
-          <span className="brand-copy"><strong>რეაბილიტაციის ცენტრი</strong><small>სამკურნალო ფიზკულტურა</small></span>
+          <Image
+            src="/logo.png"
+            alt="Rehab Center — რეაბილიტაციის ცენტრი"
+            width={210}
+            height={70}
+            priority
+            style={{ width: "clamp(168px, 18vw, 220px)", height: "auto", objectFit: "contain" }}
+          />
         </a>
         <button className="menu-button" aria-expanded={open} aria-controls="main-nav" onClick={() => setOpen((v) => !v)}>
           <span></span><span></span><span></span><span className="sr-only">მენიუ</span>
