@@ -1,1 +1,46 @@
 .team-section{background:#f7faf8}.team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.team-card{overflow:hidden;border:1px solid #dfe8e3;border-radius:24px;background:#fff;box-shadow:0 16px 40px rgba(19,61,58,.06)}.team-photo{height:260px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#edf6f2,#dfece6)}.team-photo img{width:100%;height:100%;object-fit:cover}.team-photo img[src$="logo-symbol.png"]{width:92px;height:auto;object-fit:contain;opacity:.9}.team-copy{padding:24px}.team-copy>span{display:inline-block;margin-bottom:10px;color:#1f8a70;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}.team-copy h3{margin:0 0 6px;color:#153f40;font-size:20px}.team-copy b{display:block;color:#547070;font-size:11px}.team-copy p{margin:14px 0 0;color:#607778;font-size:12px;line-height:1.75}.team-copy a{display:inline-flex;margin-top:18px;color:#176b59;font-size:11px;font-weight:800;text-decoration:none}.gallery-section{background:#fff}.gallery-grid{display:grid;grid-template-columns:1.35fr .65fr;grid-template-rows:220px 220px;gap:18px}.gallery-tile{position:relative;overflow:hidden;border-radius:24px;background:#e9efec;box-shadow:0 14px 34px rgba(15,63,59,.06)}.gallery-large{grid-row:1/3}.gallery-tile img{object-fit:cover;transition:transform .35s ease}.gallery-tile:hover img{transform:scale(1.025)}.footer-socials{display:flex;gap:12px;flex-wrap:wrap}.footer-socials a{color:inherit;text-decoration:none;font-size:10px;font-weight:700;opacity:.78}.footer-socials a:hover{opacity:1}.adm-patient-layout,.adm-settings-layout,.adm-calendar-layout{display:grid;grid-template-columns:minmax(340px,.82fr) minmax(0,1.18fr);gap:18px}.adm-settings-layout{grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr)}.adm-calendar-layout{grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr)}@media(max-width:980px){.team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:260px 220px}.gallery-large{grid-column:1/3;grid-row:auto}.adm-patient-layout,.adm-settings-layout,.adm-calendar-layout{grid-template-columns:1fr}}@media(max-width:650px){.team-grid{grid-template-columns:1fr}.team-photo{height:230px}.gallery-grid{grid-template-columns:1fr;grid-template-rows:220px 220px 220px}.gallery-large{grid-column:auto}.footer-socials{width:100%;justify-content:center}}
+
+/* Refined public branding */
+.rehab-brand{display:inline-flex;align-items:center;gap:10px;min-width:0;flex:0 1 auto}
+.rehab-brand-mark{width:48px;height:48px;display:grid;place-items:center;flex:0 0 auto;overflow:hidden;border-radius:14px}
+.rehab-brand-mark img{width:100%;height:100%;object-fit:contain!important}
+.rehab-brand-copy{display:flex;flex-direction:column;min-width:0;line-height:1}
+.rehab-brand-copy strong{display:block;white-space:nowrap;font-size:clamp(18px,1.55vw,24px);font-weight:500;letter-spacing:-.7px;color:#0d6872}
+.rehab-brand-copy strong b{font-weight:800;color:#0a5563}
+.rehab-brand-copy small{margin-top:5px;white-space:nowrap;font-size:9px;font-weight:700;letter-spacing:.15px;color:#71878a}
+
+/* Balanced photo gallery */
+.gallery-grid{grid-template-columns:1.15fr .925fr .925fr;grid-template-rows:clamp(270px,24vw,340px);gap:18px;align-items:stretch}
+.gallery-large{grid-row:auto;grid-column:auto}
+.gallery-tile{min-height:0;border-radius:26px;border:1px solid rgba(222,235,231,.9);box-shadow:0 18px 44px rgba(15,63,59,.08)}
+.gallery-tile img{width:100%!important;height:100%!important;object-fit:cover!important;transform:scale(1.001);transition:transform .35s ease}
+.gallery-tile:nth-child(1) img{object-position:center 42%}
+.gallery-tile:nth-child(2) img{object-position:center 38%}
+.gallery-tile:nth-child(3) img{object-position:center 36%}
+.gallery-tile:hover img{transform:scale(1.035)}
+
+@media(max-width:980px){
+  .rehab-brand-mark{width:44px;height:44px}
+  .rehab-brand-copy strong{font-size:20px}
+  .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:300px 235px}
+  .gallery-large{grid-column:1/3;grid-row:auto}
+  .gallery-tile:nth-child(1) img{object-position:center 38%}
+}
+
+@media(max-width:720px){
+  .header-inner{min-height:68px}
+  .rehab-brand{gap:8px;max-width:calc(100% - 58px)}
+  .rehab-brand-mark{width:40px;height:40px;border-radius:12px}
+  .rehab-brand-copy strong{font-size:18px;letter-spacing:-.5px}
+  .rehab-brand-copy small{font-size:8px;margin-top:4px}
+  .gallery-grid{grid-template-columns:1fr;grid-template-rows:none;gap:14px}
+  .gallery-large{grid-column:auto}
+  .gallery-tile{height:auto;aspect-ratio:4/3;border-radius:20px}
+  .gallery-tile:nth-child(1) img,.gallery-tile:nth-child(2) img,.gallery-tile:nth-child(3) img{object-position:center 38%}
+}
+
+@media(max-width:420px){
+  .rehab-brand-mark{width:36px;height:36px}
+  .rehab-brand-copy strong{font-size:16px}
+  .rehab-brand-copy small{display:none}
+}
