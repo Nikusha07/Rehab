@@ -11,6 +11,7 @@ const BookingSchema = new Schema(
     time: { type: String, required: true },
     durationMinutes: { type: Number, required: true },
     status: { type: String, enum: ["confirmed", "cancelled", "completed", "no_show"], default: "confirmed", index: true },
+    source: { type: String, enum: ["web", "admin"], default: "web", index: true },
     notes: { type: String, default: "" },
     confirmationCode: { type: String, required: true, unique: true, index: true },
     reminderSentAt: { type: Date, default: null, index: true },
