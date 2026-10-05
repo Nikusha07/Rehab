@@ -8,6 +8,7 @@ import "./admin-contrast.css";
 import "./admin-suite.css";
 import "./responsive-final.css";
 import "./calendar-mobile.css";
+import "./admin-mobile-fixes.css";
 
 export const metadata: Metadata = {
   title: "რეაბილიტაციის ცენტრი | ონლაინ ჩაწერა",
