@@ -7,6 +7,7 @@ const SpecialistSchema = new Schema(
     bio: { type: String, default: "" },
     image: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
+    showOnWebsite: { type: Boolean, default: false },
     sortOrder: { type: Number, default: 0 },
   },
   { timestamps: true }
