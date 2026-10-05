@@ -13,9 +13,12 @@ const BookingSchema = new Schema(
     status: { type: String, enum: ["confirmed", "cancelled", "completed", "no_show"], default: "confirmed", index: true },
     notes: { type: String, default: "" },
     confirmationCode: { type: String, required: true, unique: true, index: true },
+    reminderSentAt: { type: Date, default: null, index: true },
+    reminderLastError: { type: String, default: "" },
   },
   { timestamps: true }
 );
 BookingSchema.index({ specialistId: 1, date: 1, time: 1 });
+BookingSchema.index({ date: 1, status: 1, reminderSentAt: 1 });
 
 export default models.Booking || model("Booking", BookingSchema);
