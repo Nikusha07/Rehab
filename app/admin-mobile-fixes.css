@@ -1,0 +1,174 @@
+/* Final mobile fixes for admin detail pages */
+
+.adm-patient-layout,
+.adm-settings-layout {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.adm-patient-layout {
+  grid-template-columns: minmax(320px, .82fr) minmax(0, 1.18fr);
+}
+
+.adm-settings-layout {
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
+}
+
+.adm-patient-layout > *,
+.adm-settings-layout > *,
+.adm-settings-side,
+.adm-patient-detail {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.adm-scroll-list {
+  padding: 14px;
+  max-height: 70vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.adm-patient-row {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.adm-patient-row.is-selected {
+  border-color: var(--adm-accent);
+  box-shadow: 0 0 0 1px var(--adm-accent) inset;
+}
+
+.adm-card-title-flat {
+  padding: 0 0 16px;
+  margin-bottom: 18px;
+}
+
+.adm-section-title {
+  margin-top: 0;
+}
+
+.adm-muted-copy {
+  margin: 0;
+  color: var(--adm-muted);
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+@media (max-width: 1280px) {
+  .adm-patient-layout,
+  .adm-settings-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .adm-patient-layout,
+  .adm-settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+  }
+
+  .adm-patient-layout > *,
+  .adm-settings-layout > *,
+  .adm-settings-side,
+  .adm-patient-detail,
+  .adm-card,
+  .adm-card-pad,
+  .adm-list,
+  .adm-list-item,
+  .adm-form,
+  .adm-form-row,
+  .adm-field,
+  .adm-table-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .adm-scroll-list {
+    max-height: none;
+    padding: 10px;
+    overflow: visible;
+  }
+
+  .adm-patient-row {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .adm-patient-row .adm-badge {
+    align-self: flex-start;
+  }
+
+  .adm-patient-detail .adm-card-title {
+    align-items: flex-start;
+  }
+
+  .adm-settings-side {
+    gap: 14px;
+  }
+
+  .adm-settings-side .adm-list-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .adm-settings-side .adm-badge {
+    align-self: flex-start;
+  }
+
+  .adm-card-pad {
+    padding: 15px;
+  }
+
+  .adm-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .adm-field input,
+  .adm-field select,
+  .adm-field textarea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .adm-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .adm-table-v2 {
+    min-width: 620px;
+  }
+}
+
+@media (max-width: 460px) {
+  .adm-content {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .adm-patient-layout,
+  .adm-settings-layout {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .adm-card,
+  .adm-card-pad {
+    border-radius: 14px;
+  }
+}
