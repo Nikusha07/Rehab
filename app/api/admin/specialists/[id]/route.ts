@@ -14,6 +14,7 @@ const schema=z.object({
   bio:z.string().trim().max(2000).optional(),
   image:z.string().trim().max(500).optional(),
   isActive:z.boolean().optional(),
+  showOnWebsite:z.boolean().optional(),
   sortOrder:z.coerce.number().int().min(0).max(999).optional(),
 });
 async function auth(request:NextRequest){return verifyAdminToken(request.cookies.get(adminCookie)?.value);}
@@ -37,7 +38,7 @@ export async function DELETE(request:NextRequest,context:{params:Promise<{id:str
   await dbConnect();
   const used=await Booking.exists({specialistId:id});
   if(used){
-    const item=await Specialist.findByIdAndUpdate(id,{isActive:false},{new:true});
+    const item=await Specialist.findByIdAndUpdate(id,{isActive:false,showOnWebsite:false},{new:true});
     if(!item)return NextResponse.json({ok:false},{status:404});
     return NextResponse.json({ok:true,softDeleted:true,item});
   }
