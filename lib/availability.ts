@@ -5,7 +5,7 @@ import SlotLock from "@/models/SlotLock";
 import Specialist from "@/models/Specialist";
 import WorkingHours from "@/models/WorkingHours";
 
-export async function getAvailability(date: string, specialistId: string, durationMinutes: number) {
+export async function getAvailability(date: string, specialistId: string, durationMinutes: number, ignoreBookingId?: string) {
   const now = nowInTbilisi();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < now.date || date > addDays(now.date, SITE.bookingDaysAhead)) {
     return { ok: false, message: "ამ თარიღზე ჩაწერა შეუძლებელია.", slots: [] };
@@ -22,7 +22,9 @@ export async function getAvailability(date: string, specialistId: string, durati
   const schedule = wh || { openTime: "10:00", closeTime: "18:00", isDayOff: weekday === 0 };
   if (schedule.isDayOff) return { ok: true, blocked: true, message: "ამ დღეს სპეციალისტს სამუშაო დღე არ აქვს.", slots: [] };
 
-  const locks = await SlotLock.find({ specialistId, date }).select("time -_id").lean();
+  const lockFilter: Record<string, unknown> = { specialistId, date };
+  if (ignoreBookingId) lockFilter.bookingId = { $ne: ignoreBookingId };
+  const locks = await SlotLock.find(lockFilter).select("time -_id").lean();
   const lockedTimes = new Set(locks.map((x) => x.time));
   const start = timeToMinutes(schedule.openTime);
   const end = timeToMinutes(schedule.closeTime);
