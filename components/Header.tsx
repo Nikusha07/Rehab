@@ -19,7 +19,6 @@ export default function Header() {
         <nav id="main-nav" className={`main-nav ${open ? "is-open" : ""}`}>
           <a href="#services" onClick={close}>სერვისები</a>
           <a href="#about" onClick={close}>ჩვენ შესახებ</a>
-          <a href="#team" onClick={close}>გუნდი</a>
           <a href="#gallery" onClick={close}>სივრცე</a>
           <a href="#contact" onClick={close}>კონტაქტი</a>
           <a className="nav-cta" href="#booking" onClick={close}>ვიზიტზე ჩაწერა</a>
