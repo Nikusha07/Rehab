@@ -1,0 +1,867 @@
+/*
+ * Responsive + readability polish
+ * Keeps the original visual system, but improves legibility and makes
+ * both the public site and admin dashboard scale properly on large screens.
+ */
+
+:root {
+  --content-max: 1480px;
+  --content-gutter: clamp(24px, 4.5vw, 88px);
+  --text-readable: #526b70;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  line-height: 1.55;
+}
+
+/* ---------- Shared layout ---------- */
+.container {
+  width: min(var(--content-max), calc(100% - (var(--content-gutter) * 2)));
+}
+
+/* ---------- Public header ---------- */
+.header-inner {
+  min-height: 82px;
+}
+
+.brand-logo {
+  width: 50px;
+  height: 57px;
+}
+
+.brand-copy strong {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.brand-copy small {
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.main-nav {
+  gap: clamp(20px, 2vw, 34px);
+  font-size: 14px;
+}
+
+.main-nav .nav-cta {
+  padding: 13px 19px;
+}
+
+/* ---------- Hero ---------- */
+.hero-section {
+  padding: clamp(76px, 6vw, 112px) 0 clamp(70px, 5.2vw, 96px);
+}
+
+.hero-grid {
+  grid-template-columns: minmax(0, 1.03fr) minmax(460px, .97fr);
+  gap: clamp(48px, 5vw, 94px);
+}
+
+.eyebrow {
+  padding: 9px 13px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.hero-copy h1 {
+  max-width: 820px;
+  margin: 20px 0;
+  font-size: clamp(46px, 4.65vw, 80px);
+  line-height: 1.055;
+  letter-spacing: clamp(-2.8px, -.12vw, -1.4px);
+}
+
+.hero-copy > p {
+  max-width: 760px;
+  color: var(--text-readable);
+  font-size: clamp(16px, 1.05vw, 18px);
+  line-height: 1.85;
+}
+
+.hero-actions {
+  gap: 12px;
+  margin-top: 31px;
+}
+
+.button {
+  min-height: 54px;
+  padding: 0 23px;
+  font-size: 14px;
+}
+
+.trust-row {
+  gap: 16px;
+  max-width: 720px;
+  margin-top: 40px;
+}
+
+.trust-row b {
+  font-size: 14px;
+}
+
+.trust-row small {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.hero-visual {
+  min-height: clamp(520px, 35vw, 650px);
+}
+
+.hero-badge {
+  gap: 13px;
+  padding: 15px 18px;
+}
+
+.hero-badge b {
+  font-size: 13px;
+}
+
+.hero-badge small {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.badge-icon {
+  width: 36px;
+  height: 36px;
+}
+
+/* ---------- Quick info ---------- */
+.quick-grid > div {
+  min-height: 104px;
+  padding: 15px clamp(22px, 2.1vw, 36px);
+}
+
+.quick-grid > div > span {
+  width: 42px;
+  height: 42px;
+}
+
+.quick-grid small {
+  font-size: 10px;
+  letter-spacing: .65px;
+}
+
+.quick-grid b {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ---------- Public sections ---------- */
+.section {
+  padding: clamp(82px, 6.2vw, 112px) 0;
+}
+
+.section-heading {
+  margin-bottom: 48px;
+}
+
+.section-heading h2,
+.about-copy h2 {
+  font-size: clamp(34px, 3.25vw, 50px);
+  line-height: 1.15;
+}
+
+.section-heading > p,
+.split-heading > p,
+.centered p {
+  color: var(--text-readable);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.split-heading {
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, .82fr);
+  gap: clamp(42px, 5vw, 86px);
+}
+
+.service-grid {
+  gap: 20px;
+}
+
+.service-card {
+  min-height: 320px;
+  padding: 30px;
+  border-radius: 24px;
+}
+
+.service-index {
+  width: 46px;
+  height: 46px;
+  font-size: 12px;
+}
+
+.service-card h3 {
+  margin: 28px 0 12px;
+  font-size: 20px;
+}
+
+.service-card p {
+  color: var(--text-readable);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.service-card a {
+  font-size: 13px;
+}
+
+.about-grid {
+  gap: clamp(58px, 6vw, 104px);
+}
+
+.about-copy > p {
+  color: var(--text-readable);
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.check-list {
+  gap: 16px;
+}
+
+.check-list li {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.text-link {
+  font-size: 13px;
+}
+
+.process-grid {
+  gap: 24px;
+}
+
+.process-card h3 {
+  font-size: 18px;
+}
+
+.process-card p {
+  color: var(--text-readable);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* ---------- Booking section ---------- */
+.booking-layout {
+  grid-template-columns: minmax(360px, .78fr) minmax(560px, 1.22fr);
+  gap: clamp(48px, 5vw, 84px);
+}
+
+.booking-points b {
+  font-size: 14px;
+}
+
+.booking-points small {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.booking-form {
+  padding: 34px;
+}
+
+.booking-step {
+  gap: 14px;
+  padding-bottom: 22px;
+  margin-bottom: 24px;
+}
+
+.booking-step > span {
+  width: 38px;
+  height: 38px;
+  font-size: 12px;
+}
+
+.booking-step b {
+  font-size: 15px;
+}
+
+.booking-step small {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.field {
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.field > span {
+  font-size: 12px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  font-size: 14px;
+}
+
+.field input,
+.field select {
+  height: 52px;
+}
+
+.field textarea {
+  min-height: 96px;
+}
+
+.duration-note {
+  font-size: 11px;
+}
+
+.time-panel {
+  padding: 18px;
+}
+
+.time-panel-head b {
+  font-size: 13px;
+}
+
+.time-panel-head span {
+  font-size: 11px;
+}
+
+.empty-slots {
+  padding: 15px;
+  font-size: 11px;
+}
+
+.slot {
+  height: 42px;
+  font-size: 12px;
+}
+
+.privacy-note {
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* ---------- Admin dashboard ---------- */
+.admin-shell {
+  background: #f3f7f6;
+}
+
+.admin-shell .container {
+  width: min(1600px, calc(100% - clamp(32px, 4vw, 80px)));
+}
+
+.admin-topbar {
+  height: 82px;
+}
+
+.admin-brand {
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.admin-brand img {
+  width: 40px;
+  height: auto;
+}
+
+.admin-actions {
+  gap: 12px;
+}
+
+.admin-actions a,
+.admin-actions button {
+  min-height: 38px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  color: #3f5e63;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-actions span {
+  color: #526d71;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-main {
+  padding: 44px 0 72px;
+}
+
+.admin-heading {
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.admin-heading h1 {
+  font-size: clamp(32px, 2.5vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -.7px;
+}
+
+.admin-heading p {
+  max-width: 760px;
+  margin-top: 9px;
+  color: #5c7478;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.admin-stats {
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.admin-stat {
+  min-height: 116px;
+  padding: 24px;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(20, 64, 67, .035);
+}
+
+.admin-stat small {
+  color: #60777b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.admin-stat b {
+  margin-top: 10px;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.admin-panel {
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(20, 64, 67, .04);
+}
+
+.admin-toolbar {
+  padding: 20px;
+}
+
+.admin-filter {
+  gap: 9px;
+}
+
+.admin-filter button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: #4f696d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-table {
+  min-width: 1180px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 18px 20px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.admin-table th {
+  color: #61797d;
+  font-size: 10px;
+  letter-spacing: .7px;
+}
+
+.admin-table td b {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.admin-table td small {
+  margin-top: 5px;
+  color: #6b8185;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.status-badge {
+  padding: 7px 10px;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.row-actions {
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.row-actions button {
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.admin-empty {
+  padding: 52px 24px;
+  font-size: 13px;
+}
+
+/* ---------- Large desktop ---------- */
+@media (min-width: 1440px) {
+  .hero-copy h1 {
+    max-width: 860px;
+  }
+
+  .hero-photo {
+    inset: 12px 0 0 22px;
+  }
+
+  .service-card {
+    min-height: 335px;
+  }
+
+  .admin-main {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1800px) {
+  :root {
+    --content-max: 1540px;
+  }
+
+  .admin-shell .container {
+    width: min(1680px, calc(100% - 112px));
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.06fr) minmax(590px, .94fr);
+  }
+
+  .hero-visual {
+    min-height: 660px;
+  }
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 1180px) {
+  :root {
+    --content-gutter: 24px;
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, .9fr);
+    gap: 42px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(43px, 5vw, 62px);
+  }
+
+  .admin-shell .container {
+    width: min(100% - 32px, 1180px);
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 15px 16px;
+  }
+}
+
+@media (max-width: 980px) {
+  .hero-grid,
+  .about-grid,
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-visual {
+    min-height: 500px;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .split-heading {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-intro {
+    max-width: 760px;
+  }
+
+  .admin-heading {
+    align-items: flex-start;
+  }
+
+  .admin-mobile-list {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .admin-mobile-card {
+    padding: 17px;
+    border-radius: 16px;
+  }
+
+  .admin-mobile-card h3 {
+    font-size: 15px;
+  }
+
+  .admin-mobile-card p {
+    color: #61797d;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .admin-mobile-card .status-badge {
+    font-size: 10px;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  :root {
+    --content-gutter: 12px;
+  }
+
+  .container {
+    width: calc(100% - 24px);
+  }
+
+  .header-inner {
+    min-height: 68px;
+  }
+
+  .brand-copy strong {
+    font-size: 12px;
+  }
+
+  .brand-copy small {
+    font-size: 9px;
+  }
+
+  .hero-section {
+    padding: 58px 0 56px;
+  }
+
+  .hero-copy h1 {
+    margin: 16px 0;
+    font-size: clamp(37px, 11.3vw, 52px);
+    line-height: 1.07;
+    letter-spacing: -1.5px;
+  }
+
+  .hero-copy > p {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+  }
+
+  .trust-row b {
+    font-size: 13px;
+  }
+
+  .trust-row small {
+    font-size: 10px;
+  }
+
+  .hero-visual {
+    min-height: 400px;
+  }
+
+  .hero-badge b {
+    font-size: 12px;
+  }
+
+  .hero-badge small {
+    font-size: 9px;
+  }
+
+  .section {
+    padding: 68px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 32px;
+  }
+
+  .section-heading h2,
+  .about-copy h2 {
+    font-size: clamp(29px, 8.4vw, 38px);
+    letter-spacing: -.8px;
+  }
+
+  .section-heading > p,
+  .split-heading > p,
+  .centered p,
+  .about-copy > p {
+    font-size: 14px;
+  }
+
+  .service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card {
+    min-height: 280px;
+    padding: 24px;
+  }
+
+  .service-card h3 {
+    font-size: 18px;
+  }
+
+  .service-card p {
+    font-size: 13px;
+  }
+
+  .booking-form {
+    padding: 22px 16px;
+  }
+
+  .field > span {
+    font-size: 11px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    font-size: 16px; /* avoids iOS input zoom and improves readability */
+  }
+
+  .slot {
+    font-size: 11px;
+  }
+
+  .admin-shell .container {
+    width: calc(100% - 24px);
+  }
+
+  .admin-topbar {
+    height: auto;
+    min-height: 72px;
+    padding: 10px 0;
+  }
+
+  .admin-topbar-inner {
+    align-items: flex-start;
+  }
+
+  .admin-brand {
+    font-size: 12px;
+  }
+
+  .admin-actions {
+    gap: 7px;
+  }
+
+  .admin-actions a,
+  .admin-actions button {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .admin-actions span {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 30px 0 50px;
+  }
+
+  .admin-heading {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .admin-heading h1 {
+    font-size: 28px;
+  }
+
+  .admin-heading p {
+    font-size: 12px;
+  }
+
+  .admin-heading .admin-actions {
+    width: 100%;
+  }
+
+  .admin-heading .admin-actions button {
+    flex: 1;
+  }
+
+  .admin-stats {
+    gap: 10px;
+  }
+
+  .admin-stat {
+    min-height: 100px;
+    padding: 18px;
+  }
+
+  .admin-stat small {
+    font-size: 10px;
+  }
+
+  .admin-stat b {
+    font-size: 28px;
+  }
+
+  .admin-toolbar {
+    padding: 14px;
+  }
+
+  .admin-filter button {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-stat {
+    min-height: 92px;
+    padding: 16px;
+  }
+
+  .admin-mobile-card-top {
+    display: grid;
+  }
+
+  .row-actions button {
+    flex: 1;
+    min-width: 86px;
+  }
+}
