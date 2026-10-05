@@ -25,7 +25,7 @@ export default async function HomePage() {
     await dbConnect();
     const [serviceDocs, specialistDocs] = await Promise.all([
       Service.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean(),
-      Specialist.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean(),
+      Specialist.find({ isActive: true, showOnWebsite: true }).sort({ sortOrder: 1, name: 1 }).lean(),
     ]);
     if (serviceDocs.length) services = serviceDocs.map((x: any, i: number) => ({ icon: String(i + 1).padStart(2, "0"), title: x.name, text: x.description || `${x.durationMinutes || 30}-წუთიანი ინდივიდუალური სარეაბილიტაციო მომსახურება.` }));
     specialists = specialistDocs as any[];
