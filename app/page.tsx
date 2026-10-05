@@ -14,6 +14,8 @@ const services = [
 
 export default function HomePage() {
   const phoneDisplay = SITE.phone.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4");
+  const mapQuery = encodeURIComponent(SITE.address);
+
   return (
     <main id="top">
       <Header />
@@ -103,6 +105,30 @@ export default function HomePage() {
         <div className="container contact-card">
           <div><span className="eyebrow green">კონტაქტი</span><h2>კითხვა გაქვთ ვიზიტამდე?</h2><p>დაგვიკავშირდით სამუშაო საათებში ან გამოიყენეთ ონლაინ ჩაწერის ფორმა.</p></div>
           <div className="contact-actions"><a className="contact-pill" href={`tel:${SITE.phone}`}><small>ტელეფონი</small><b>{phoneDisplay}</b></a><div className="contact-pill"><small>მისამართი</small><b>{SITE.address}</b></div></div>
+        </div>
+      </section>
+
+      <section className="map-section" aria-labelledby="location-title">
+        <div className="container map-layout">
+          <div className="map-copy">
+            <span className="eyebrow green">ლოკაცია</span>
+            <h2 id="location-title">მარტივად მოგვაგენით</h2>
+            <p>რუკაზე ნაჩვენებია ცენტრის მისამართი. მარშრუტის გასახსნელად დააჭირეთ ღილაკს და Google Maps-ში პირდაპირ გადახვალთ.</p>
+            <div className="map-address-card">
+              <span className="map-pin" aria-hidden="true">⌖</span>
+              <div><small>მისამართი</small><strong>{SITE.address}</strong></div>
+            </div>
+            <a className="button button-primary map-route-button" href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`} target="_blank" rel="noreferrer">მარშრუტის გახსნა <span>↗</span></a>
+          </div>
+          <div className="map-frame-wrap">
+            <iframe
+              title={`${SITE.name} — რუკა`}
+              src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
         </div>
       </section>
 
