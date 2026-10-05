@@ -3,26 +3,36 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const navItems = [
-  { href: "/admin", label: "ჯავშნები", icon: "◫" },
-  { href: "/admin/calendar", label: "კალენდარი", icon: "▦" },
-  { href: "/admin/patients", label: "პაციენტები", icon: "♙" },
-  { href: "/admin/services", label: "სერვისები", icon: "✚" },
-  { href: "/admin/specialists", label: "სპეციალისტები", icon: "♟" },
-  { href: "/admin/schedule", label: "სამუშაო გრაფიკი", icon: "◷" },
-  { href: "/admin/blocked-dates", label: "დაბლოკილი დღეები", icon: "⊘" },
-  { href: "/admin/sms", label: "SMS ჟურნალი", icon: "✉" },
-  { href: "/admin/analytics", label: "ანალიტიკა", icon: "⌁" },
-  { href: "/admin/audit", label: "Audit log", icon: "◎" },
-  { href: "/admin/settings", label: "პარამეტრები", icon: "⚙" },
+type Role = "owner" | "reception" | "doctor";
+const navItems: { href: string; label: string; icon: string; roles: Role[] }[] = [
+  { href: "/admin", label: "ჯავშნები", icon: "◫", roles: ["owner","reception","doctor"] },
+  { href: "/admin/calendar", label: "კალენდარი", icon: "▦", roles: ["owner","reception","doctor"] },
+  { href: "/admin/patients", label: "პაციენტები", icon: "♙", roles: ["owner","reception","doctor"] },
+  { href: "/admin/services", label: "სერვისები", icon: "✚", roles: ["owner"] },
+  { href: "/admin/specialists", label: "სპეციალისტები", icon: "♟", roles: ["owner"] },
+  { href: "/admin/schedule", label: "სამუშაო გრაფიკი", icon: "◷", roles: ["owner"] },
+  { href: "/admin/blocked-dates", label: "დაბლოკილი დღეები", icon: "⊘", roles: ["owner"] },
+  { href: "/admin/sms", label: "SMS ჟურნალი", icon: "✉", roles: ["owner","reception"] },
+  { href: "/admin/analytics", label: "ანალიტიკა", icon: "⌁", roles: ["owner","reception","doctor"] },
+  { href: "/admin/audit", label: "Audit log", icon: "◎", roles: ["owner"] },
+  { href: "/admin/users", label: "Admin მომხმარებლები", icon: "♚", roles: ["owner"] },
+  { href: "/admin/settings", label: "პარამეტრები", icon: "⚙", roles: ["owner"] },
 ];
+const roleLabels: Record<Role,string> = { owner: "Owner", reception: "Reception", doctor: "Doctor" };
 
 export default function AdminShell({ username, children }: { username: string; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [role, setRole] = useState<Role>("doctor");
+
+  useEffect(() => {
+    fetch("/api/admin/me", { cache: "no-store" }).then((r) => r.json()).then((d) => {
+      if (["owner","reception","doctor"].includes(d.role)) setRole(d.role);
+    }).catch(() => undefined);
+  }, []);
 
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -38,7 +48,7 @@ export default function AdminShell({ username, children }: { username: string; c
           <span><b>რეაბილიტაციის ცენტრი</b><small>ადმინისტრაცია</small></span>
         </div>
         <nav className="adm-nav" aria-label="ადმინისტრაციის მენიუ">
-          {navItems.map((item) => {
+          {navItems.filter((item) => item.roles.includes(role)).map((item) => {
             const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} className={active ? "active" : ""} onClick={() => setOpen(false)}>
@@ -59,7 +69,7 @@ export default function AdminShell({ username, children }: { username: string; c
         <header className="adm-topbar">
           <button className="adm-menu" onClick={() => setOpen((v) => !v)} aria-label="მენიუ"><span /><span /><span /></button>
           <div className="adm-topbar-title"><b>მართვის პანელი</b><small>ცენტრის ყოველდღიური ოპერაციები</small></div>
-          <div className="adm-user"><span className="adm-user-dot">{username.slice(0,1).toUpperCase()}</span><span><small>ადმინისტრატორი</small><b>{username}</b></span></div>
+          <div className="adm-user"><span className="adm-user-dot">{username.slice(0,1).toUpperCase()}</span><span><small>{roleLabels[role]}</small><b>{username}</b></span></div>
         </header>
         <div className="adm-content">{children}</div>
       </div>
