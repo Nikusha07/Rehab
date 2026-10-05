@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PwaRegister from "@/components/PwaRegister";
 import "./globals.css";
 import "./polish.css";
 import "./typography.css";
@@ -14,12 +15,15 @@ import "./admin-enhancements.css";
 export const metadata: Metadata = {
   title: "რეაბილიტაციის ცენტრი | ონლაინ ჩაწერა",
   description: "სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი — ონლაინ ჩაწერა, სპეციალისტები და მომსახურებები.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Rehab Center", statusBarStyle: "default" },
+  formatDetection: { telephone: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ka">
-      <body>{children}</body>
+      <body>{children}<PwaRegister /></body>
     </html>
   );
 }
