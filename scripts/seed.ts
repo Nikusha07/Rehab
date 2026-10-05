@@ -6,8 +6,8 @@ import WorkingHours from "../models/WorkingHours";
 const uri = process.env.MONGODB_URI;
 if (!uri) throw new Error("MONGODB_URI არ არის მითითებული .env.local ფაილში");
 
-async function run() {
-  await mongoose.connect(uri);
+async function run(mongoUri: string) {
+  await mongoose.connect(mongoUri);
 
   const services = [
     { name: "სარეაბილიტაციო კონსულტაცია", description: "პირველადი შეფასება და ინდივიდუალური გეგმის შედგენა.", durationMinutes: 30, sortOrder: 1 },
@@ -40,7 +40,7 @@ async function run() {
   await mongoose.disconnect();
 }
 
-run().catch(async (error) => {
+run(uri).catch(async (error) => {
   console.error(error);
   await mongoose.disconnect().catch(() => undefined);
   process.exit(1);
