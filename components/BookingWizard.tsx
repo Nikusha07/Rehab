@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Service = { _id: string; name: string; description?: string; durationMinutes: number; price?: number | null };
 type Specialist = { _id: string; name: string; title?: string };
@@ -26,6 +26,7 @@ export default function BookingWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const successRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     Promise.all([fetch("/api/services").then((r) => r.json()), fetch("/api/specialists").then((r) => r.json())])
@@ -48,6 +49,23 @@ export default function BookingWizard() {
       .finally(() => setLoadingSlots(false));
     return () => controller.abort();
   }, [serviceId, specialistId, date]);
+
+  useEffect(() => {
+    if (!confirmation) return;
+    const scrollToSuccess = () => {
+      const node = successRef.current;
+      if (!node) return;
+      const top = node.getBoundingClientRect().top + window.scrollY - 88;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      node.focus({ preventScroll: true });
+    };
+    const frame = requestAnimationFrame(() => requestAnimationFrame(scrollToSuccess));
+    const timer = window.setTimeout(scrollToSuccess, 220);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [confirmation]);
 
   const selectedService = useMemo(() => services.find((s) => s._id === serviceId), [services, serviceId]);
   const availableSlots = slots.filter((s) => s.available);
@@ -74,7 +92,7 @@ export default function BookingWizard() {
   }
 
   if (confirmation) return (
-    <div className="booking-success" role="status">
+    <div className="booking-success" role="status" ref={successRef} tabIndex={-1} aria-live="polite">
       <div className="success-check">✓</div>
       <span className="eyebrow green">ჩაწერა დასრულებულია</span>
       <h3>გელოდებით ვიზიტზე</h3>
