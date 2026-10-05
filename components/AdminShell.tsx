@@ -15,6 +15,7 @@ const navItems = [
   { href: "/admin/blocked-dates", label: "დაბლოკილი დღეები", icon: "⊘" },
   { href: "/admin/sms", label: "SMS ჟურნალი", icon: "✉" },
   { href: "/admin/analytics", label: "ანალიტიკა", icon: "⌁" },
+  { href: "/admin/audit", label: "Audit log", icon: "◎" },
   { href: "/admin/settings", label: "პარამეტრები", icon: "⚙" },
 ];
 
