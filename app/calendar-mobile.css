@@ -1,0 +1,73 @@
+.adm-calendar-mobile{display:none}
+
+.adm-calendar-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);
+  gap:18px;
+}
+
+.adm-selected-day{min-width:0}
+
+@media(max-width:1280px){
+  .adm-calendar-layout{grid-template-columns:1fr}
+}
+
+@media(max-width:700px){
+  .adm-calendar-desktop{display:none}
+  .adm-calendar-mobile{display:block}
+  .adm-calendar-layout{grid-template-columns:1fr;gap:12px}
+  .adm-mobile-days{
+    display:grid;
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    gap:6px;
+    padding:12px;
+  }
+  .adm-mobile-day{
+    position:relative;
+    min-width:0;
+    min-height:64px;
+    display:grid;
+    place-items:center;
+    align-content:center;
+    gap:3px;
+    padding:7px 3px;
+    border:1px solid var(--adm-border);
+    border-radius:12px;
+    background:#fff;
+    color:var(--adm-text);
+    font:inherit;
+    cursor:pointer;
+  }
+  .adm-mobile-day span{font-size:8px;color:var(--adm-muted);font-weight:800}
+  .adm-mobile-day b{font-size:14px;line-height:1}
+  .adm-mobile-day small{
+    position:absolute;
+    right:5px;
+    top:5px;
+    min-width:16px;
+    height:16px;
+    display:grid;
+    place-items:center;
+    padding:0 4px;
+    border-radius:999px;
+    background:#e9f5f0;
+    color:#176c59;
+    font-size:8px;
+    font-weight:900;
+  }
+  .adm-mobile-day.active{
+    border-color:var(--adm-accent);
+    background:var(--adm-accent);
+    color:#fff;
+    box-shadow:0 8px 20px rgba(31,138,112,.18)
+  }
+  .adm-mobile-day.active span{color:rgba(255,255,255,.82)}
+  .adm-mobile-day.active small{background:#fff;color:var(--adm-accent-strong)}
+  .adm-selected-day .adm-list{padding:10px!important}
+  .adm-selected-day .adm-list-item{padding:13px}
+}
+
+@media(max-width:460px){
+  .adm-mobile-days{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+  .adm-mobile-day{min-height:60px}
+}
