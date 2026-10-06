@@ -17,7 +17,7 @@ export async function getSiteConfig():Promise<SiteConfig>{
     const doc:any=await SiteSetting.findOne({key:"main"}).lean();
     if(!doc)return fallback;
     const savedMapQuery = String(doc.mapQuery || "").trim();
-    const compactMapQuery = savedMapQuery.replace(/\\s/g, "");
+    const compactMapQuery = savedMapQuery.split(" ").join("");
     const mapQuery = !savedMapQuery || compactMapQuery === "42.33825,43.40750" ? SITE.mapQuery : savedMapQuery;
     return {
       ...fallback,
