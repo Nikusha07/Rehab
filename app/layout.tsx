@@ -16,6 +16,7 @@ import "./booking-verification.css";
 import "./booking-premium.css";
 import "./booking-final-v2.css";
 import "./booking-final-v3.css";
+import "./mobile-menu-fix.css";
 
 export const metadata: Metadata = {
   title: "რეაბილიტაციის ცენტრი | ონლაინ ჩაწერა",
