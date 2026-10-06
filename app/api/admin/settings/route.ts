@@ -36,17 +36,24 @@ export async function GET(request: NextRequest) {
     isGoSmsConfigured() ? getGoSmsBalance() : Promise.resolve({ success: false, skipped: true as const }),
   ]);
 
-  const item: any = doc || {
+  const rawItem: any = doc || {
     key: "main",
     centerName: SITE.name,
     tagline: SITE.tagline,
     phone: SITE.phone,
     address: SITE.address,
-    mapQuery: SITE.address,
+    mapQuery: SITE.mapQuery,
     hours: SITE.hours,
     facebook: "",
     instagram: "",
     whatsapp: "",
+  };
+
+  const savedMapQuery = String(rawItem.mapQuery || "").trim();
+  const compactMapQuery = savedMapQuery.replace(/\\s/g, "");
+  const item = {
+    ...rawItem,
+    mapQuery: !savedMapQuery || compactMapQuery === "42.33825,43.40750" ? SITE.mapQuery : savedMapQuery,
   };
 
   return NextResponse.json({

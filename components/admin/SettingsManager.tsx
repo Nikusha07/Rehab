@@ -101,7 +101,7 @@ export default function SettingsManager() {
           <div className="adm-field"><span>მოკლე აღწერა / tagline</span><input required value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} /></div>
           <div className="adm-form-row">
             <div className="adm-field"><span>მისამართის ტექსტი</span><input required value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} /></div>
-            <div className="adm-field"><span>Google Maps query / კოორდინატები</span><input required placeholder="42.33825, 43.40750" value={form.mapQuery} onChange={e => setForm({ ...form, mapQuery: e.target.value })} /></div>
+            <div className="adm-field"><span>Google Maps query / კოორდინატები</span><input required placeholder="42.332196, 43.403760" value={form.mapQuery} onChange={e => setForm({ ...form, mapQuery: e.target.value })} /></div>
           </div>
           <div className="adm-field"><span>სამუშაო საათების ტექსტი</span><input required value={form.hours} onChange={e => setForm({ ...form, hours: e.target.value })} /></div>
           <div className="adm-form-row">

@@ -1,11 +1,11 @@
-/* Final header + mobile navigation polish — intentionally loaded last. */
+/* Canonical public header. Loaded last so every viewport uses one responsive system. */
 
 .public-site .site-header {
   position: sticky !important;
   top: 0 !important;
-  z-index: 190 !important;
+  z-index: 300 !important;
   overflow: visible !important;
-  background: rgba(255, 254, 244, .94) !important;
+  background: rgba(255, 254, 244, .97) !important;
   border-bottom: 1px solid rgba(18, 83, 70, .09) !important;
   box-shadow: 0 8px 26px rgba(18, 61, 58, .045) !important;
   backdrop-filter: blur(16px) saturate(135%) !important;
@@ -13,31 +13,34 @@
 }
 
 .public-site .header-inner {
-  width: min(1320px, calc(100% - 56px)) !important;
-  min-height: 88px !important;
-  padding: 10px 0 !important;
+  width: min(1320px, calc(100% - 48px)) !important;
+  min-height: 82px !important;
+  padding: 8px 0 !important;
   position: relative !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 36px !important;
+  gap: 28px !important;
   overflow: visible !important;
 }
 
 .public-site .brand {
   position: relative !important;
-  z-index: 203 !important;
-  display: flex !important;
+  z-index: 304 !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
   flex: 0 0 auto !important;
-  width: 270px !important;
-  max-width: 30vw !important;
-  height: 66px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
   overflow: visible !important;
   line-height: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .public-site .brand-logo,
@@ -45,13 +48,16 @@
   display: block !important;
   width: auto !important;
   height: 62px !important;
-  max-width: 270px !important;
-  max-height: 62px !important;
+  min-width: 0 !important;
+  max-width: 250px !important;
+  max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
   object-fit: contain !important;
   object-position: left center !important;
   transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .public-site .main-nav {
@@ -59,89 +65,81 @@
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 30px !important;
+  gap: 26px !important;
+  min-width: 0 !important;
 }
 
 .public-site .main-nav > a:not(.nav-cta) {
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
+  min-height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
   color: #31574f !important;
   font-size: 13px !important;
   font-weight: 780 !important;
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
 .public-site .main-nav .nav-cta {
-  min-height: 48px !important;
+  min-height: 46px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 21px !important;
+  padding: 0 20px !important;
   border-radius: 14px !important;
   background: linear-gradient(135deg, #2b8d77, #1c755f) !important;
   color: #fff !important;
   box-shadow: 0 10px 24px rgba(31, 122, 99, .16) !important;
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
-.public-site .mobile-menu-backdrop,
-.public-site .menu-button {
-  display: none;
+.public-site .menu-button,
+.public-site .mobile-menu-backdrop {
+  display: none !important;
 }
 
-@media (max-width: 1050px) and (min-width: 861px) {
+@media (max-width: 1280px) and (min-width: 1101px) {
   .public-site .header-inner {
-    width: min(100% - 38px, 1240px) !important;
+    width: calc(100% - 38px) !important;
     gap: 20px !important;
-  }
-
-  .public-site .brand {
-    width: 220px !important;
-    height: 58px !important;
   }
 
   .public-site .brand-logo,
   .public-site .brand img {
-    height: 54px !important;
-    max-width: 220px !important;
-    max-height: 54px !important;
+    height: 56px !important;
+    max-width: 225px !important;
   }
 
   .public-site .main-nav {
-    gap: 18px !important;
+    gap: 17px !important;
   }
 
   .public-site .main-nav > a:not(.nav-cta) {
     font-size: 12px !important;
   }
+
+  .public-site .main-nav .nav-cta {
+    padding-inline: 17px !important;
+  }
 }
 
-@media (max-width: 860px) {
-  .public-site .site-header {
-    z-index: 300 !important;
-  }
-
+@media (max-width: 1100px) {
   .public-site .header-inner {
-    width: min(100% - 30px, 760px) !important;
+    width: min(100% - 30px, 980px) !important;
     min-height: 72px !important;
     padding: 7px 0 !important;
     gap: 14px !important;
-    z-index: 302 !important;
   }
 
   .public-site .brand {
-    width: 190px !important;
-    max-width: calc(100% - 62px) !important;
-    height: 54px !important;
+    max-width: calc(100% - 64px) !important;
   }
 
   .public-site .brand-logo,
   .public-site .brand img {
     width: auto !important;
-    height: 50px !important;
-    max-width: 190px !important;
-    max-height: 50px !important;
+    height: 52px !important;
+    max-width: 210px !important;
+    max-height: none !important;
   }
 
   .public-site .menu-button {
@@ -151,32 +149,17 @@
     height: 44px !important;
     flex: 0 0 44px !important;
     display: flex !important;
-    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 5px !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: 1px solid rgba(22, 93, 78, .11) !important;
+    border: 1px solid rgba(22, 93, 78, .12) !important;
     border-radius: 50% !important;
-    background: rgba(255, 255, 255, .72) !important;
+    background: rgba(255,255,255,.86) !important;
     color: #184d44 !important;
     box-shadow: 0 7px 20px rgba(19, 78, 67, .075) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    cursor: pointer;
+    cursor: pointer !important;
     -webkit-tap-highlight-color: transparent;
-    transition: background .2s ease, border-color .2s ease, transform .18s ease, box-shadow .2s ease !important;
-  }
-
-  .public-site .menu-button:active {
-    transform: scale(.94) !important;
-  }
-
-  .public-site .menu-button.is-open {
-    background: #1f806c !important;
-    border-color: #1f806c !important;
-    box-shadow: 0 9px 24px rgba(31, 128, 108, .2) !important;
   }
 
   .public-site .menu-button > span:not(.sr-only) {
@@ -185,30 +168,20 @@
     width: 20px !important;
     height: 2px !important;
     margin: 0 !important;
-    border: 0 !important;
     border-radius: 999px !important;
     background: currentColor !important;
-    transform-origin: center !important;
-    transition: transform .24s cubic-bezier(.22,.8,.25,1), opacity .16s ease, top .24s cubic-bezier(.22,.8,.25,1) !important;
-  }
-
-  .public-site .menu-button > span:nth-child(1) {
-    top: 15px !important;
     transform: translateX(-50%) !important;
+    transition: .2s ease !important;
   }
 
-  .public-site .menu-button > span:nth-child(2) {
-    top: 21px !important;
-    transform: translateX(-50%) !important;
-  }
+  .public-site .menu-button > span:nth-child(1) { top: 15px !important; }
+  .public-site .menu-button > span:nth-child(2) { top: 21px !important; }
+  .public-site .menu-button > span:nth-child(3) { top: 27px !important; }
 
-  .public-site .menu-button > span:nth-child(3) {
-    top: 27px !important;
-    transform: translateX(-50%) !important;
-  }
-
-  .public-site .menu-button.is-open > span:not(.sr-only) {
-    background: #fff !important;
+  .public-site .menu-button.is-open {
+    color: #fff !important;
+    background: #1f806c !important;
+    border-color: #1f806c !important;
   }
 
   .public-site .menu-button.is-open > span:nth-child(1) {
@@ -218,7 +191,6 @@
 
   .public-site .menu-button.is-open > span:nth-child(2) {
     opacity: 0 !important;
-    transform: translateX(-50%) scaleX(.2) !important;
   }
 
   .public-site .menu-button.is-open > span:nth-child(3) {
@@ -230,7 +202,7 @@
     display: block !important;
     position: fixed !important;
     inset: 0 !important;
-    z-index: 299 !important;
+    z-index: 301 !important;
     border: 0 !important;
     background: rgba(8, 43, 37, .30) !important;
     backdrop-filter: blur(3px) !important;
@@ -239,29 +211,29 @@
 
   .public-site .main-nav {
     position: fixed !important;
-    z-index: 304 !important;
-    top: max(82px, calc(env(safe-area-inset-top) + 72px)) !important;
+    z-index: 305 !important;
+    top: max(80px, calc(env(safe-area-inset-top) + 70px)) !important;
     left: 14px !important;
     right: 14px !important;
     width: auto !important;
     height: auto !important;
-    max-height: min(68vh, 520px) !important;
+    max-height: min(72vh, 540px) !important;
     margin: 0 !important;
     padding: 12px !important;
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 5px !important;
     overflow-y: auto !important;
-    border: 1px solid rgba(220, 233, 228, .97) !important;
+    border: 1px solid rgba(220,233,228,.97) !important;
     border-radius: 20px !important;
-    background: rgba(255, 255, 255, .985) !important;
-    box-shadow: 0 24px 64px rgba(9, 57, 48, .22) !important;
+    background: rgba(255,255,255,.99) !important;
+    box-shadow: 0 24px 64px rgba(9,57,48,.22) !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
     transform: translateY(-8px) scale(.985) !important;
     transform-origin: top right !important;
-    transition: opacity .2s ease, transform .22s cubic-bezier(.22,.8,.25,1), visibility .2s ease !important;
+    transition: opacity .2s ease, transform .22s ease, visibility .2s ease !important;
   }
 
   .public-site .main-nav.is-open {
@@ -286,11 +258,6 @@
     text-align: left !important;
   }
 
-  .public-site .main-nav a:not(.nav-cta):hover,
-  .public-site .main-nav a:not(.nav-cta):active {
-    background: #f1f7f4 !important;
-  }
-
   .public-site .main-nav a:not(.nav-cta)::after {
     display: none !important;
   }
@@ -299,31 +266,21 @@
     min-height: 48px !important;
     margin-top: 4px !important;
     justify-content: center !important;
-    padding: 0 16px !important;
-    border-radius: 12px !important;
-    background: linear-gradient(135deg, #268b75, #176c5b) !important;
     color: #fff !important;
-    box-shadow: 0 9px 22px rgba(35, 134, 123, .18) !important;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .public-site .header-inner {
-    width: calc(100% - 28px) !important;
+    width: calc(100% - 24px) !important;
     min-height: 68px !important;
     padding: 6px 0 !important;
-  }
-
-  .public-site .brand {
-    width: 168px !important;
-    height: 50px !important;
   }
 
   .public-site .brand-logo,
   .public-site .brand img {
     height: 46px !important;
-    max-width: 168px !important;
-    max-height: 46px !important;
+    max-width: 180px !important;
   }
 
   .public-site .menu-button {
@@ -332,16 +289,18 @@
     flex-basis: 42px !important;
   }
 
-  .public-site .menu-button > span:nth-child(1) { top: 14px !important; }
-  .public-site .menu-button > span:nth-child(2) { top: 20px !important; }
-  .public-site .menu-button > span:nth-child(3) { top: 26px !important; }
-  .public-site .menu-button.is-open > span:nth-child(1),
-  .public-site .menu-button.is-open > span:nth-child(3) { top: 20px !important; }
-
   .public-site .main-nav {
     top: max(76px, calc(env(safe-area-inset-top) + 66px)) !important;
     left: 10px !important;
     right: 10px !important;
     border-radius: 18px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .public-site .brand-logo,
+  .public-site .brand img {
+    height: 42px !important;
+    max-width: 158px !important;
   }
 }

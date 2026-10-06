@@ -6,7 +6,7 @@ const SiteSettingSchema=new Schema({
   tagline:{type:String,default:"სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი"},
   phone:{type:String,default:"599000000"},
   address:{type:String,default:"თბილისი, საქართველო"},
-  mapQuery:{type:String,default:""},
+  mapQuery:{type:String,default:"42.332196, 43.403760"},
   hours:{type:String,default:"10:00 – 18:00"},
   facebook:{type:String,default:""},
   instagram:{type:String,default:""},

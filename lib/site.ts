@@ -11,18 +11,21 @@ export type SiteConfig = typeof SITE & {
 };
 
 export async function getSiteConfig():Promise<SiteConfig>{
-  const fallback:SiteConfig={...SITE,centerName:SITE.name,facebook:"",instagram:"",whatsapp:"",mapQuery:SITE.address};
+  const fallback:SiteConfig={...SITE,centerName:SITE.name,facebook:"",instagram:"",whatsapp:"",mapQuery:SITE.mapQuery};
   try{
     await dbConnect();
     const doc:any=await SiteSetting.findOne({key:"main"}).lean();
     if(!doc)return fallback;
+    const savedMapQuery = String(doc.mapQuery || "").trim();
+    const compactMapQuery = savedMapQuery.replace(/\\s/g, "");
+    const mapQuery = !savedMapQuery || compactMapQuery === "42.33825,43.40750" ? SITE.mapQuery : savedMapQuery;
     return {
       ...fallback,
       centerName:doc.centerName||fallback.centerName,
       tagline:doc.tagline||fallback.tagline,
       phone:doc.phone||fallback.phone,
       address:doc.address||fallback.address,
-      mapQuery:doc.mapQuery||doc.address||fallback.mapQuery,
+      mapQuery,
       hours:doc.hours||fallback.hours,
       facebook:doc.facebook||"",
       instagram:doc.instagram||"",
