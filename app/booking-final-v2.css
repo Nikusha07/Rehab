@@ -1,0 +1,730 @@
+/* Final booking + header visual polish. Loaded last on purpose. */
+
+/* ---------- Header ---------- */
+.public-site .site-header {
+  background: rgba(255, 253, 240, .97) !important;
+  border-bottom: 1px solid rgba(14, 91, 76, .08) !important;
+  box-shadow: 0 8px 28px rgba(27, 72, 62, .035) !important;
+  overflow: visible !important;
+}
+
+.public-site .header-inner {
+  min-height: 92px !important;
+  padding-block: 10px !important;
+  gap: 28px !important;
+  overflow: visible !important;
+}
+
+.public-site .brand {
+  width: auto !important;
+  max-width: none !important;
+  height: 70px !important;
+  display: flex !important;
+  align-items: center !important;
+  overflow: visible !important;
+  flex: 0 0 auto !important;
+}
+
+.public-site .brand-logo,
+.public-site .brand img {
+  display: block !important;
+  width: auto !important;
+  height: 66px !important;
+  max-width: 235px !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+}
+
+.public-site .main-nav {
+  gap: 30px !important;
+}
+
+.public-site .main-nav > a:not(.nav-cta) {
+  color: #31584f !important;
+  font-size: 14px !important;
+  font-weight: 760 !important;
+}
+
+.public-site .nav-cta {
+  min-height: 48px !important;
+  padding: 0 22px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, #22856f, #176f5d) !important;
+  box-shadow: 0 10px 24px rgba(23, 111, 93, .16) !important;
+}
+
+/* ---------- Booking section ---------- */
+.public-site .booking-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 84px 0 96px !important;
+  background:
+    radial-gradient(circle at 14% 15%, rgba(133, 210, 174, .22), transparent 28%),
+    radial-gradient(circle at 88% 20%, rgba(202, 232, 177, .14), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(17, 94, 75, .32), transparent 44%),
+    linear-gradient(145deg, #0b5d4c 0%, #0d745e 46%, #0a5a49 100%) !important;
+}
+
+.public-site .booking-section::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  left: -170px;
+  bottom: -230px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 0 0 42px rgba(255,255,255,.024), 0 0 0 92px rgba(255,255,255,.016);
+  z-index: -1;
+}
+
+.public-site .booking-section::after {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -170px;
+  top: 90px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: 0 0 0 34px rgba(255,255,255,.02);
+  z-index: -1;
+}
+
+.public-site .booking-layout {
+  width: min(1120px, calc(100% - 40px)) !important;
+  display: block !important;
+}
+
+/* The form already has its own heading; removing the duplicate intro makes the section cleaner. */
+.public-site .booking-intro {
+  display: none !important;
+}
+
+.public-site .booking-shell {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.public-site .booking-form-premium {
+  width: 100%;
+  padding: 34px !important;
+  overflow: hidden;
+  border: 1px solid rgba(226, 235, 229, .96) !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 91% 4%, rgba(87, 176, 139, .12), transparent 24%),
+    linear-gradient(180deg, #fffef9 0%, #fbfcf8 100%) !important;
+  box-shadow: 0 34px 82px rgba(3, 46, 37, .24) !important;
+}
+
+.public-site .booking-form-premium::before {
+  opacity: .55 !important;
+}
+
+.public-site .premium-booking-head {
+  min-height: 102px !important;
+  grid-template-columns: 56px minmax(0, 1fr) 92px !important;
+  gap: 18px !important;
+  padding: 0 4px 26px !important;
+}
+
+.public-site .premium-booking-head-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(145deg, #e4f4ec, #fff0ce) !important;
+  color: #176f5d !important;
+  font-size: 24px !important;
+  box-shadow: 0 10px 26px rgba(22, 112, 91, .11) !important;
+}
+
+.public-site .premium-kicker {
+  margin-bottom: 5px !important;
+  color: #2a8a73 !important;
+  font-size: 11px !important;
+  letter-spacing: .65px !important;
+}
+
+.public-site .premium-booking-head h3 {
+  color: #123f39 !important;
+  font-size: 36px !important;
+  line-height: 1.06 !important;
+  letter-spacing: -.7px !important;
+}
+
+.public-site .premium-booking-head p {
+  max-width: 560px;
+  margin-top: 8px !important;
+  color: #71847f !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+.public-site .premium-calendar {
+  width: 86px !important;
+  height: 72px !important;
+  border-radius: 24px !important;
+  background: linear-gradient(145deg, #e0f3e9, #fff2cd) !important;
+  transform: rotate(2deg) !important;
+}
+
+.public-site .premium-calendar b {
+  font-size: 36px !important;
+  color: #237f69 !important;
+}
+
+/* ---------- Step cards ---------- */
+.public-site .premium-step-card,
+.public-site .premium-verification-card {
+  margin-top: 16px !important;
+  padding: 26px !important;
+  border: 1px solid #dfe9e4 !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,.82) !important;
+  box-shadow: 0 10px 34px rgba(17, 67, 57, .035) !important;
+}
+
+.public-site .premium-step-head {
+  gap: 14px !important;
+  margin-bottom: 24px !important;
+  padding-bottom: 18px !important;
+  border-bottom: 1px solid #e8eeeb !important;
+}
+
+.public-site .premium-step-number,
+.public-site .premium-shield {
+  width: 42px !important;
+  height: 42px !important;
+  flex-basis: 42px !important;
+  background: linear-gradient(145deg, #249379, #126d59) !important;
+  box-shadow: 0 8px 20px rgba(15, 112, 89, .18) !important;
+}
+
+.public-site .premium-step-head b {
+  color: #183f3a !important;
+  font-size: 17px !important;
+}
+
+.public-site .premium-step-head small {
+  margin-top: 4px !important;
+  color: #7f918c !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+.public-site .premium-field-grid {
+  gap: 20px 22px !important;
+}
+
+.public-site .premium-field > span {
+  margin-bottom: 9px !important;
+  color: #214b45 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.public-site .premium-field > span em {
+  font-size: 10px !important;
+}
+
+.public-site .premium-control input,
+.public-site .premium-control select,
+.public-site .premium-control textarea {
+  border-color: #d5e0db !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  color: #264b44 !important;
+  font-size: 14px !important;
+  box-shadow: 0 1px 0 rgba(16, 76, 64, .02) !important;
+}
+
+.public-site .premium-control input,
+.public-site .premium-control select {
+  height: 58px !important;
+  padding-left: 50px !important;
+}
+
+.public-site .premium-control textarea {
+  min-height: 96px !important;
+  padding: 16px 16px 14px 50px !important;
+}
+
+.public-site .premium-control i {
+  left: 16px !important;
+  width: 26px !important;
+  height: 26px !important;
+  color: #15705f !important;
+  font-size: 16px !important;
+  opacity: .92;
+}
+
+.public-site .premium-control input:focus,
+.public-site .premium-control select:focus,
+.public-site .premium-control textarea:focus {
+  border-color: #3e9b83 !important;
+  box-shadow: 0 0 0 4px rgba(40, 143, 116, .09) !important;
+}
+
+.public-site .premium-slot-meta {
+  min-height: 34px !important;
+  margin-top: 13px !important;
+  color: #7b8f89 !important;
+  font-size: 11px !important;
+}
+
+.public-site .premium-slot-meta .is-ok {
+  color: #267d68 !important;
+}
+
+.public-site .premium-slot-meta b {
+  color: #1f6c5c !important;
+  font-size: 11px !important;
+}
+
+.public-site .premium-field-full + .premium-field-full {
+  margin-top: 18px !important;
+}
+
+/* ---------- SMS verification ---------- */
+.public-site .premium-verification-card {
+  background:
+    radial-gradient(circle at 90% 20%, rgba(242, 229, 168, .26), transparent 28%),
+    linear-gradient(145deg, #edf8f2 0%, #f7fbf3 55%, #fff9e8 100%) !important;
+  border-color: #cfe3d9 !important;
+}
+
+.public-site .premium-verification-card.is-verified {
+  background: linear-gradient(145deg, #e8f6ef, #f5fbf7) !important;
+  border-color: #b9dacd !important;
+}
+
+.public-site .verification-title-row {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+}
+
+.public-site .verified-badge {
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  background: #d8eee4 !important;
+  color: #156550 !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+}
+
+.public-site .verification-phone-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 220px !important;
+  gap: 14px !important;
+  align-items: end !important;
+}
+
+.public-site .premium-send-code,
+.public-site .premium-verify-code {
+  min-height: 58px !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, #17745f, #0f6654) !important;
+  color: #fff !important;
+  font: inherit;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 24px rgba(18, 105, 84, .16) !important;
+  cursor: pointer;
+}
+
+.public-site .premium-send-code:disabled,
+.public-site .premium-verify-code:disabled {
+  cursor: not-allowed;
+  background: #a8bdb4 !important;
+  box-shadow: none !important;
+  opacity: .72;
+}
+
+.public-site .premium-otp-area {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 120px 210px !important;
+  gap: 18px !important;
+  align-items: end !important;
+  margin-top: 22px !important;
+  padding-top: 20px !important;
+  border-top: 1px solid rgba(48, 116, 96, .13) !important;
+}
+
+.public-site .otp-label {
+  display: block;
+  margin-bottom: 9px !important;
+  color: #214b45 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.public-site .otp-boxes {
+  display: grid !important;
+  grid-template-columns: repeat(6, 48px) !important;
+  gap: 8px !important;
+}
+
+.public-site .otp-boxes input {
+  width: 48px !important;
+  height: 54px !important;
+  padding: 0 !important;
+  border: 1px solid #cfded7 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  color: #174b42 !important;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  outline: none;
+}
+
+.public-site .otp-boxes input:focus {
+  border-color: #2e9177 !important;
+  box-shadow: 0 0 0 3px rgba(34, 139, 111, .09) !important;
+}
+
+.public-site .otp-timer {
+  min-height: 54px !important;
+  padding: 8px 12px !important;
+  border-left: 1px solid rgba(35, 112, 92, .13) !important;
+  display: grid !important;
+  align-content: center !important;
+}
+
+.public-site .otp-timer small {
+  color: #70867f !important;
+  font-size: 10px !important;
+}
+
+.public-site .otp-timer b {
+  color: #174d43 !important;
+  font-size: 19px !important;
+}
+
+.public-site .verification-message {
+  margin: 14px 0 0 !important;
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+}
+
+.public-site .premium-form-error {
+  margin-top: 16px !important;
+  border-radius: 13px !important;
+}
+
+.public-site .premium-submit {
+  width: 100% !important;
+  min-height: 60px !important;
+  margin-top: 18px !important;
+  border: 0 !important;
+  border-radius: 15px !important;
+  background: linear-gradient(135deg, #0f6b56, #0b5d4c) !important;
+  color: #fff !important;
+  font: inherit;
+  font-size: 15px !important;
+  font-weight: 850 !important;
+  box-shadow: 0 14px 30px rgba(12, 97, 77, .18) !important;
+}
+
+.public-site .premium-submit:disabled {
+  background: #9db4aa !important;
+  color: rgba(255,255,255,.92) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+.public-site .premium-privacy {
+  max-width: 760px;
+  margin: 12px auto 0 !important;
+  color: #899690 !important;
+  font-size: 9.5px !important;
+  line-height: 1.55 !important;
+  text-align: center !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .public-site .header-inner {
+    min-height: 80px !important;
+  }
+
+  .public-site .brand {
+    height: 60px !important;
+  }
+
+  .public-site .brand-logo,
+  .public-site .brand img {
+    height: 56px !important;
+    max-width: 200px !important;
+  }
+
+  .public-site .main-nav {
+    gap: 20px !important;
+  }
+
+  .public-site .booking-section {
+    padding: 64px 0 74px !important;
+  }
+
+  .public-site .booking-layout {
+    width: min(920px, calc(100% - 30px)) !important;
+  }
+
+  .public-site .booking-form-premium {
+    padding: 28px !important;
+  }
+
+  .public-site .premium-otp-area {
+    grid-template-columns: 1fr 110px !important;
+  }
+
+  .public-site .premium-verify-code {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .public-site .header-inner {
+    min-height: 68px !important;
+    padding-block: 7px !important;
+    gap: 12px !important;
+  }
+
+  .public-site .brand {
+    height: 50px !important;
+    max-width: calc(100% - 58px) !important;
+  }
+
+  .public-site .brand-logo,
+  .public-site .brand img {
+    height: 46px !important;
+    max-width: 170px !important;
+  }
+
+  .public-site .menu-button {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 13px !important;
+  }
+
+  .public-site .booking-section {
+    padding: 38px 0 48px !important;
+  }
+
+  .public-site .booking-layout {
+    width: calc(100% - 22px) !important;
+  }
+
+  .public-site .booking-form-premium {
+    padding: 18px !important;
+    border-radius: 24px !important;
+  }
+
+  .public-site .premium-booking-head {
+    min-height: 0 !important;
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 2px 0 18px !important;
+  }
+
+  .public-site .premium-booking-head-icon {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    font-size: 20px !important;
+  }
+
+  .public-site .premium-booking-head h3 {
+    font-size: 27px !important;
+  }
+
+  .public-site .premium-booking-head p {
+    margin-top: 5px !important;
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+  }
+
+  .public-site .premium-kicker {
+    font-size: 9px !important;
+  }
+
+  .public-site .premium-calendar {
+    display: none !important;
+  }
+
+  .public-site .premium-step-card,
+  .public-site .premium-verification-card {
+    margin-top: 12px !important;
+    padding: 17px !important;
+    border-radius: 18px !important;
+  }
+
+  .public-site .premium-step-head {
+    gap: 11px !important;
+    margin-bottom: 17px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .public-site .premium-step-number,
+  .public-site .premium-shield {
+    width: 36px !important;
+    height: 36px !important;
+    flex-basis: 36px !important;
+    font-size: 14px !important;
+  }
+
+  .public-site .premium-step-head b {
+    font-size: 15px !important;
+  }
+
+  .public-site .premium-step-head small {
+    font-size: 9.5px !important;
+  }
+
+  .public-site .premium-field-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  .public-site .premium-field > span {
+    margin-bottom: 7px !important;
+    font-size: 12px !important;
+  }
+
+  .public-site .premium-control input,
+  .public-site .premium-control select {
+    height: 54px !important;
+    padding-left: 46px !important;
+    font-size: 13px !important;
+  }
+
+  .public-site .premium-control textarea {
+    min-height: 88px !important;
+    padding-left: 46px !important;
+    font-size: 13px !important;
+  }
+
+  .public-site .premium-control i {
+    left: 13px !important;
+    font-size: 15px !important;
+  }
+
+  .public-site .premium-slot-meta {
+    display: grid !important;
+    gap: 5px !important;
+    margin-top: 10px !important;
+    font-size: 9.5px !important;
+  }
+
+  .public-site .verification-title-row {
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+  }
+
+  .public-site .verified-badge {
+    grid-column: 1 / -1;
+    width: fit-content;
+    margin-top: -4px;
+  }
+
+  .public-site .verification-phone-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .public-site .premium-send-code,
+  .public-site .premium-verify-code {
+    width: 100% !important;
+    min-height: 54px !important;
+  }
+
+  .public-site .premium-otp-area {
+    grid-template-columns: 1fr !important;
+    gap: 13px !important;
+    margin-top: 16px !important;
+    padding-top: 16px !important;
+  }
+
+  .public-site .otp-boxes {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .public-site .otp-boxes input {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 50px !important;
+    border-radius: 11px !important;
+    font-size: 19px !important;
+  }
+
+  .public-site .otp-timer {
+    min-height: 0 !important;
+    padding: 10px 0 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid rgba(35, 112, 92, .12) !important;
+    grid-template-columns: auto 1fr auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .public-site .otp-timer b {
+    font-size: 17px !important;
+  }
+
+  .public-site .premium-submit {
+    min-height: 56px !important;
+    margin-top: 14px !important;
+    font-size: 14px !important;
+  }
+
+  .public-site .premium-privacy {
+    font-size: 8.8px !important;
+    line-height: 1.5 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .public-site .brand-logo,
+  .public-site .brand img {
+    height: 42px !important;
+    max-width: 150px !important;
+  }
+
+  .public-site .booking-layout {
+    width: calc(100% - 16px) !important;
+  }
+
+  .public-site .booking-form-premium {
+    padding: 14px !important;
+    border-radius: 21px !important;
+  }
+
+  .public-site .premium-step-card,
+  .public-site .premium-verification-card {
+    padding: 15px !important;
+    border-radius: 16px !important;
+  }
+
+  .public-site .premium-booking-head h3 {
+    font-size: 24px !important;
+  }
+
+  .public-site .otp-boxes {
+    gap: 5px !important;
+  }
+
+  .public-site .otp-boxes input {
+    height: 46px !important;
+    font-size: 18px !important;
+  }
+}
