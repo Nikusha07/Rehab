@@ -12,7 +12,7 @@ export default function Header() {
         <a className="brand" href="#top" onClick={close} aria-label="Rehab Center — მთავარი გვერდი">
           <img
             className="brand-logo"
-            src="/logo.png?v=20261006-final"
+            src="/logo.png?v=20261006-premium"
             alt="Rehab Center"
             width={480}
             height={160}
