@@ -295,7 +295,7 @@ export default async function HomePage() {
       <footer className="footer">
         <div className="container footer-inner">
           <div className="footer-brand">
-            <Image src="/logo.png" alt="Rehab Center" width={180} height={60} />
+            <Image src="/logo.svg?v=20261007-final" alt="Rehab Center" width={200} height={60} />
             <p><b>{site.centerName}</b><small>{site.tagline}</small></p>
           </div>
           <div className="footer-socials">

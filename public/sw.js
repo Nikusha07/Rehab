@@ -1,4 +1,4 @@
-const CACHE = "rehab-shell-v2";
+const CACHE = "rehab-shell-v3";
 const CORE = ["/", "/admin/login"];
 
 self.addEventListener("install", (event) => {

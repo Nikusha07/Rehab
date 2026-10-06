@@ -29,10 +29,10 @@ export default function Header() {
         <a className="brand" href="#top" onClick={close} aria-label="Rehab Center — მთავარი გვერდი">
           <img
             className="brand-logo"
-            src="/logo.png?v=20261007-responsive-v4"
+            src="/logo.svg?v=20261007-final"
             alt="Rehab Center"
             width={600}
-            height={200}
+            height={180}
             loading="eager"
             decoding="async"
           />

@@ -18,7 +18,12 @@ export async function getSiteConfig():Promise<SiteConfig>{
     if(!doc)return fallback;
     const savedMapQuery = String(doc.mapQuery || "").trim();
     const compactMapQuery = savedMapQuery.split(" ").join("");
-    const mapQuery = !savedMapQuery || compactMapQuery === "42.33825,43.40750" ? SITE.mapQuery : savedMapQuery;
+    const legacyMapQueries = new Set(["42.33825,43.40750", "42.3382498,43.4075005"]);
+    const shouldMigrateMap = !savedMapQuery || legacyMapQueries.has(compactMapQuery);
+    const mapQuery = shouldMigrateMap ? SITE.mapQuery : savedMapQuery;
+    if (shouldMigrateMap && savedMapQuery) {
+      await SiteSetting.updateOne({ key: "main" }, { $set: { mapQuery: SITE.mapQuery } }).catch(() => undefined);
+    }
     return {
       ...fallback,
       centerName:doc.centerName||fallback.centerName,

@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   const compactMapQuery = savedMapQuery.split(" ").join("");
   const item = {
     ...rawItem,
-    mapQuery: !savedMapQuery || compactMapQuery === "42.33825,43.40750" ? SITE.mapQuery : savedMapQuery,
+    mapQuery: !savedMapQuery || ["42.33825,43.40750", "42.3382498,43.4075005"].includes(compactMapQuery) ? SITE.mapQuery : savedMapQuery,
   };
 
   return NextResponse.json({
