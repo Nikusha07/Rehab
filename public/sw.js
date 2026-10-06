@@ -1,4 +1,4 @@
-const CACHE = "rehab-shell-v1";
+const CACHE = "rehab-shell-v2";
 const CORE = ["/", "/admin/login"];
 
 self.addEventListener("install", (event) => {
@@ -20,8 +20,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE).then((cache) => cache.put(request, clone)).catch(() => undefined);
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, clone)).catch(() => undefined);
+        }
         return response;
       })
       .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 export default function Header() {
@@ -10,27 +9,15 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <a
-          className="brand"
-          href="#top"
-          onClick={close}
-          aria-label="Rehab Center — მთავარი გვერდი"
-          style={{ flexShrink: 0 }}
-        >
-          <Image
-            src="/logo.png"
+        <a className="brand" href="#top" onClick={close} aria-label="Rehab Center — მთავარი გვერდი">
+          <img
+            className="brand-logo"
+            src="/logo.png?v=20261006-3"
             alt="Rehab Center"
             width={360}
             height={120}
-            priority
-            style={{
-              display: "block",
-              width: "clamp(145px, 16vw, 210px)",
-              height: "auto",
-              maxHeight: "54px",
-              objectFit: "contain",
-              objectPosition: "left center",
-            }}
+            loading="eager"
+            decoding="async"
           />
         </a>
 

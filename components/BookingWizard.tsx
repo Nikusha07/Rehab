@@ -6,6 +6,7 @@ type Service = { _id: string; name: string; description?: string; durationMinute
 type Specialist = { _id: string; name: string; title?: string };
 type Slot = { time: string; available: boolean; reason?: string };
 type Confirmation = { confirmationCode: string; date: string; time: string; service: string; specialist: string };
+type VerificationStatus = "idle" | "sent" | "verified";
 
 function todayInput() {
   const d = new Date();
@@ -26,6 +27,13 @@ export default function BookingWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const [phone, setPhone] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationToken, setVerificationToken] = useState("");
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>("idle");
+  const [verificationBusy, setVerificationBusy] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState("");
+  const [cooldown, setCooldown] = useState(0);
   const successRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -67,12 +75,85 @@ export default function BookingWizard() {
     };
   }, [confirmation]);
 
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setTimeout(() => setCooldown((value) => Math.max(0, value - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [cooldown]);
+
   const selectedService = useMemo(() => services.find((s) => s._id === serviceId), [services, serviceId]);
   const availableSlots = slots.filter((s) => s.available);
+
+  function changePhone(value: string) {
+    const next = value.replace(/\D/g, "").slice(0, 9);
+    setPhone(next);
+    setVerificationCode("");
+    setVerificationToken("");
+    setVerificationStatus("idle");
+    setVerificationMessage("");
+  }
+
+  async function sendVerificationCode() {
+    setError("");
+    setVerificationMessage("");
+    if (!/^5\d{8}$/.test(phone)) {
+      setVerificationMessage("შეიყვანეთ სწორი 9-ციფრიანი ნომერი.");
+      return;
+    }
+    setVerificationBusy(true);
+    try {
+      const res = await fetch("/api/phone-verification/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (typeof data.retryAfter === "number") setCooldown(data.retryAfter);
+        throw new Error(data.message || "კოდის გამოგზავნა ვერ მოხერხდა.");
+      }
+      setVerificationToken("");
+      setVerificationCode("");
+      setVerificationStatus("sent");
+      setCooldown(Number(data.retryAfter || 60));
+      setVerificationMessage("6-ნიშნა კოდი გამოგზავნილია SMS-ით. კოდი მოქმედებს 5 წუთი.");
+    } catch (e) {
+      setVerificationMessage(e instanceof Error ? e.message : "კოდის გამოგზავნა ვერ მოხერხდა.");
+    } finally {
+      setVerificationBusy(false);
+    }
+  }
+
+  async function verifyPhone() {
+    setError("");
+    setVerificationMessage("");
+    if (!/^\d{6}$/.test(verificationCode)) {
+      setVerificationMessage("შეიყვანეთ SMS-ით მიღებული 6-ნიშნა კოდი.");
+      return;
+    }
+    setVerificationBusy(true);
+    try {
+      const res = await fetch("/api/phone-verification/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, code: verificationCode }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "კოდის დადასტურება ვერ მოხერხდა.");
+      setVerificationToken(data.token || "");
+      setVerificationStatus("verified");
+      setVerificationMessage("ნომერი წარმატებით დადასტურდა.");
+    } catch (e) {
+      setVerificationMessage(e instanceof Error ? e.message : "კოდის დადასტურება ვერ მოხერხდა.");
+    } finally {
+      setVerificationBusy(false);
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError("");
     if (!time) return setError("აირჩიეთ თავისუფალი დრო.");
+    if (verificationStatus !== "verified" || !verificationToken) return setError("ჯერ დაადასტურეთ ტელეფონის ნომერი SMS კოდით.");
     const form = new FormData(event.currentTarget);
     setSubmitting(true);
     try {
@@ -80,12 +161,19 @@ export default function BookingWizard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          patientName: form.get("patientName"), patientPhone: form.get("patientPhone"),
+          patientName: form.get("patientName"), patientPhone: phone, phoneVerificationToken: verificationToken,
           serviceId, specialistId, date, time, notes: form.get("notes") || "", website: form.get("website") || "",
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "ჩაწერა ვერ შესრულდა.");
+      if (!res.ok) {
+        if (res.status === 403) {
+          setVerificationToken("");
+          setVerificationStatus("idle");
+          setVerificationCode("");
+        }
+        throw new Error(data.message || "ჩაწერა ვერ შესრულდა.");
+      }
       setConfirmation(data);
     } catch (e) { setError(e instanceof Error ? e.message : "ჩაწერა ვერ შესრულდა."); }
     finally { setSubmitting(false); }
@@ -98,8 +186,11 @@ export default function BookingWizard() {
       <h3>გელოდებით ვიზიტზე</h3>
       <p>{confirmation.service} — {confirmation.specialist}</p>
       <div className="confirmation-grid"><strong>{confirmation.date}</strong><strong>{confirmation.time}</strong></div>
-      <div className="code-box"><small>დადასტურების კოდი</small><b>{confirmation.confirmationCode}</b></div>
-      <button className="button button-soft" onClick={() => { setConfirmation(null); setTime(""); setDate(""); }}>ახალი ჩაწერა</button>
+      <div className="code-box"><small>ჯავშნის კოდი</small><b>{confirmation.confirmationCode}</b></div>
+      <p className="verification-success-copy">ვიზიტის დეტალები SMS-ითაც გამოგეგზავნათ დადასტურებულ ნომერზე.</p>
+      <button className="button button-soft" onClick={() => {
+        setConfirmation(null); setTime(""); setDate(""); setPhone(""); setVerificationCode(""); setVerificationToken(""); setVerificationStatus("idle"); setVerificationMessage(""); setCooldown(0);
+      }}>ახალი ჩაწერა</button>
     </div>
   );
 
@@ -117,16 +208,36 @@ export default function BookingWizard() {
         {!serviceId || !specialistId || !date ? <p className="empty-slots">დროების სანახავად შეავსეთ ზემოთ მოცემული სამი ველი.</p> :
           <div className="slot-grid">{slots.map((slot) => <button type="button" key={slot.time} disabled={!slot.available} title={slot.reason} className={`slot ${time === slot.time ? "selected" : ""}`} onClick={() => setTime(slot.time)}>{slot.time}</button>)}</div>}
       </div>
-      <div className="booking-step second"><span>2</span><div><b>თქვენი ინფორმაცია</b><small>დადასტურებისთვის დაგვჭირდება მხოლოდ ძირითადი მონაცემები</small></div></div>
-      <div className="field-grid two">
+
+      <div className="booking-step second"><span>2</span><div><b>თქვენი ინფორმაცია</b><small>ტელეფონის ნომერს SMS კოდით დაადასტურებთ</small></div></div>
+      <div className="field-grid two patient-grid">
         <label className="field"><span>სახელი და გვარი</span><input name="patientName" type="text" minLength={2} maxLength={120} placeholder="მაგ. ნინო ბერიძე" required /></label>
-        <label className="field"><span>ტელეფონი</span><input name="patientPhone" type="tel" inputMode="numeric" pattern="5[0-9]{8}" maxLength={9} placeholder="5XX XX XX XX" required /></label>
+        <label className="field"><span>ტელეფონი</span><input name="patientPhone" value={phone} onChange={(e) => changePhone(e.target.value)} type="tel" inputMode="numeric" pattern="5[0-9]{8}" maxLength={9} placeholder="5XX XX XX XX" autoComplete="tel" required /></label>
       </div>
+
+      <div className={`phone-verification ${verificationStatus === "verified" ? "is-verified" : ""}`}>
+        <div className="phone-verification-head">
+          <div><b>ნომრის დადასტურება</b><small>SMS კოდი იცავს ჯავშანს არასწორი ან სხვისი ნომრის გამოყენებისგან.</small></div>
+          {verificationStatus === "verified" && <span className="verified-badge">✓ დადასტურებულია</span>}
+        </div>
+
+        {verificationStatus !== "verified" && <div className="verification-actions">
+          <button type="button" className="button button-soft verify-send-button" onClick={sendVerificationCode} disabled={verificationBusy || cooldown > 0 || !/^5\d{8}$/.test(phone)}>
+            {verificationBusy && verificationStatus === "idle" ? "იგზავნება..." : cooldown > 0 ? `ხელახლა ${cooldown}წმ` : verificationStatus === "sent" ? "კოდის ხელახლა გაგზავნა" : "SMS კოდის მიღება"}
+          </button>
+          {verificationStatus === "sent" && <div className="verification-code-row">
+            <input aria-label="SMS დადასტურების კოდი" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" />
+            <button type="button" className="button button-primary" onClick={verifyPhone} disabled={verificationBusy || verificationCode.length !== 6}>{verificationBusy ? "მოწმდება..." : "კოდის დადასტურება"}</button>
+          </div>}
+        </div>}
+        {verificationMessage && <p className={`verification-message ${verificationStatus === "verified" ? "success" : ""}`}>{verificationMessage}</p>}
+      </div>
+
       <label className="field"><span>შენიშვნა <em>არასავალდებულო</em></span><textarea name="notes" rows={3} maxLength={1000} placeholder="მაგ. სასურველი დამატებითი ინფორმაცია"></textarea></label>
       <input className="honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       {error && <div className="form-error">{error}</div>}
-      <button className="button button-primary submit-button" disabled={submitting || !time}>{submitting ? "მუშავდება..." : "ვიზიტის დადასტურება"}<span>→</span></button>
-      <p className="privacy-note">ჩაწერით ადასტურებთ, რომ მითითებული ნომერი თქვენ გეკუთვნით და ეთანხმებით ვიზიტთან დაკავშირებული შეტყობინების მიღებას.</p>
+      <button className="button button-primary submit-button" disabled={submitting || !time || verificationStatus !== "verified"}>{submitting ? "მუშავდება..." : verificationStatus !== "verified" ? "ჯერ დაადასტურეთ ნომერი" : "ვიზიტის დადასტურება"}<span>→</span></button>
+      <p className="privacy-note">ჩაწერით ადასტურებთ, რომ მითითებული ნომერი თქვენ გეკუთვნით და ეთანხმებით ვიზიტთან დაკავშირებული შეტყობინებების მიღებას.</p>
     </form>
   );
 }
