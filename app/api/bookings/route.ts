@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         { session }
       );
       booking = created[0];
-      const keys = slotKeys(specialistId, date, time, service.durationMinutes, SITE.slotMinutes);
+      const keys = slotKeys(specialistId, date, time, service.durationMinutes, SITE.lockMinutes);
       await SlotLock.insertMany(
         keys.map((key) => ({ key, bookingId: booking._id, specialistId, date, time: key.split("|").at(-1) })),
         { session, ordered: true }
