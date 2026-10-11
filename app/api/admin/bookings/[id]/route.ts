@@ -61,7 +61,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
       const mustRebuildLocks = scheduleChanged || booking.status !== nextStatus;
       if (mustRebuildLocks) await SlotLock.deleteMany({ bookingId: booking._id }).session(session);
       if (nextStatus === "confirmed" && mustRebuildLocks) {
-        const keys = slotKeys(specialistId, date, time, service.durationMinutes, SITE.slotMinutes);
+        const keys = slotKeys(specialistId, date, time, service.durationMinutes, SITE.lockMinutes);
         await SlotLock.insertMany(keys.map((key) => ({ key, bookingId: booking._id, specialistId, date, time: key.split("|").at(-1) })), { session, ordered: true });
       }
       booking.patientId = patient._id; booking.patientName = patientName; booking.patientPhone = patientPhone; booking.serviceId = serviceId; booking.specialistId = specialistId; booking.date = date; booking.time = time; booking.durationMinutes = service.durationMinutes; booking.notes = notes; booking.status = nextStatus;
