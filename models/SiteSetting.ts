@@ -11,6 +11,7 @@ const SiteSettingSchema=new Schema({
   facebook:{type:String,default:""},
   instagram:{type:String,default:""},
   whatsapp:{type:String,default:""},
+  configVersion:{type:Number,default:1},
 },{timestamps:true});
 
 export default models.SiteSetting||model("SiteSetting",SiteSettingSchema);
