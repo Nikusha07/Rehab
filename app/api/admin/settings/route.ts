@@ -31,10 +31,13 @@ export async function GET(request: NextRequest) {
   if (!hasAdminPermission(a, "settings.write")) return NextResponse.json({ ok: false }, { status: 403 });
 
   await dbConnect();
-  const [doc, smsBalance] = await Promise.all([
-    SiteSetting.findOne({ key: "main" }).lean(),
-    isGoSmsConfigured() ? getGoSmsBalance() : Promise.resolve({ success: false, skipped: true as const }),
-  ]);
+  const doc = await SiteSetting.findOne({ key: "main" }).lean();
+  const smsBalance: any = isGoSmsConfigured()
+    ? await Promise.race([
+        getGoSmsBalance(),
+        new Promise((resolve) => setTimeout(() => resolve({ success: false, timedOut: true }), 2500)),
+      ])
+    : { success: false, skipped: true as const };
 
   const rawItem: any = doc || {
     key: "main",
@@ -51,10 +54,23 @@ export async function GET(request: NextRequest) {
 
   const savedMapQuery = String(rawItem.mapQuery || "").trim();
   const compactMapQuery = savedMapQuery.split(" ").join("");
-  const item = {
-    ...rawItem,
-    mapQuery: !savedMapQuery || ["42.33825,43.40750", "42.3382498,43.4075005"].includes(compactMapQuery) ? SITE.mapQuery : savedMapQuery,
-  };
+  const mapQuery = !savedMapQuery || ["42.33825,43.40750", "42.3382498,43.4075005"].includes(compactMapQuery) ? SITE.mapQuery : savedMapQuery;
+
+  const savedPhone = String(rawItem.phone || "").replace(/\D/g, "");
+  const phone = !savedPhone || savedPhone === "599000000" ? SITE.phone : savedPhone;
+
+  const savedHours = String(rawItem.hours || "").trim();
+  const compactHours = savedHours.replace(/\s/g, "");
+  const hours = !savedHours || ["10:00–18:00", "10:00-18:00", "10:00—18:00"].includes(compactHours) ? SITE.hours : savedHours;
+
+  const item = { ...rawItem, mapQuery, phone, hours };
+
+  if (doc && (phone !== savedPhone || hours !== savedHours || mapQuery !== savedMapQuery)) {
+    await SiteSetting.updateOne(
+      { key: "main" },
+      { $set: { phone, hours, mapQuery } }
+    ).catch(() => undefined);
+  }
 
   return NextResponse.json({
     ok: true,
@@ -87,7 +103,7 @@ export async function PUT(request: NextRequest) {
   const item = await SiteSetting.findOneAndUpdate(
     { key: "main" },
     { $set: { ...parsed.data, key: "main" } },
-    { new: true, upsert: true, runValidators: true }
+    { returnDocument: "after", upsert: true, runValidators: true }
   );
 
   await writeAudit({
