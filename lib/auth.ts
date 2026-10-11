@@ -18,6 +18,9 @@ const permissions: Record<AdminAccessRole, AdminPermission[]> = {
 };
 
 export function hasAdminPermission(payload: any, permission: AdminPermission) {
+  const username = String(payload?.username || "").trim().toLowerCase();
+  const primaryUsername = (process.env.ADMIN_USERNAME || "admin").trim().toLowerCase();
+  if (username && username === primaryUsername) return permissions.owner.includes(permission);
   const role = (payload?.accessRole || "owner") as AdminAccessRole;
   return permissions[role]?.includes(permission) ?? false;
 }
