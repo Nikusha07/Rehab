@@ -26,14 +26,24 @@ export default function SettingsManager() {
   const [testPhone, setTestPhone] = useState("");
   const [testingSms, setTestingSms] = useState(false);
   const [smsMessage, setSmsMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   async function load() {
-    const r = await fetch("/api/admin/settings", { cache: "no-store" });
-    const d = await r.json().catch(() => ({}));
-    if (r.ok) {
+    setLoading(true);
+    try {
+      const r = await fetch("/api/admin/settings", { cache: "no-store" });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setMessage(d.message || "პარამეტრების ჩატვირთვა ვერ მოხერხდა.");
+        return;
+      }
       setForm({ ...empty, ...d.item });
-      setIntegrations(d.integrations || integrations);
-      setGoSms(d.gosms || gosms);
+      setIntegrations(d.integrations || { mongo: false, auth: false, gosms: false });
+      setGoSms(d.gosms || { configured: false, sender: "", balanceOk: false, balance: null });
+    } catch {
+      setMessage("პარამეტრების ჩატვირთვა ვერ მოხერხდა. სცადეთ გვერდის განახლება.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -89,6 +99,9 @@ export default function SettingsManager() {
       <div><h1>პარამეტრები</h1><p>ცენტრის საჯარო ინფორმაცია, ლოკაცია, სოციალური ბმულები, backup და ინტეგრაციების სტატუსი.</p></div>
       <div className="adm-page-actions"><a className="adm-btn" href="/api/admin/backup">JSON Backup</a></div>
     </div>
+
+    {loading && <div className="adm-notice" style={{ marginBottom: 14 }}>პარამეტრები იტვირთება...</div>}
+    {!loading && message && message.includes("ჩატვირთვა") && <div className="adm-notice error" style={{ marginBottom: 14 }}>{message}</div>}
 
     <div className="adm-settings-layout">
       <section className="adm-card adm-card-pad">
