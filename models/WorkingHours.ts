@@ -7,6 +7,7 @@ const WorkingHoursSchema = new Schema(
     openTime: { type: String, default: "09:00" },
     closeTime: { type: String, default: "18:00" },
     isDayOff: { type: Boolean, default: false },
+    scheduleVersion: { type: Number, default: 1 },
   },
   { timestamps: true }
 );
