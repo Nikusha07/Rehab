@@ -21,17 +21,32 @@ export async function getSiteConfig():Promise<SiteConfig>{
     const legacyMapQueries = new Set(["42.33825,43.40750", "42.3382498,43.4075005"]);
     const shouldMigrateMap = !savedMapQuery || legacyMapQueries.has(compactMapQuery);
     const mapQuery = shouldMigrateMap ? SITE.mapQuery : savedMapQuery;
-    if (shouldMigrateMap && savedMapQuery) {
-      await SiteSetting.updateOne({ key: "main" }, { $set: { mapQuery: SITE.mapQuery } }).catch(() => undefined);
+
+    const savedPhone = String(doc.phone || "").replace(/\D/g, "");
+    const shouldMigratePhone = !savedPhone || savedPhone === "599000000";
+    const phone = shouldMigratePhone ? SITE.phone : savedPhone;
+
+    const savedHours = String(doc.hours || "").trim();
+    const compactHours = savedHours.replace(/\s/g, "");
+    const shouldMigrateHours = !savedHours || ["10:00–18:00", "10:00-18:00", "10:00—18:00"].includes(compactHours);
+    const hours = shouldMigrateHours ? SITE.hours : savedHours;
+
+    const migration: Record<string, string> = {};
+    if (shouldMigrateMap && savedMapQuery) migration.mapQuery = SITE.mapQuery;
+    if (shouldMigratePhone && savedPhone) migration.phone = SITE.phone;
+    if (shouldMigrateHours && savedHours) migration.hours = SITE.hours;
+    if (Object.keys(migration).length) {
+      await SiteSetting.updateOne({ key: "main" }, { $set: migration }).catch(() => undefined);
     }
+
     return {
       ...fallback,
       centerName:doc.centerName||fallback.centerName,
       tagline:doc.tagline||fallback.tagline,
-      phone:doc.phone||fallback.phone,
+      phone,
       address:doc.address||fallback.address,
       mapQuery,
-      hours:doc.hours||fallback.hours,
+      hours,
       facebook:doc.facebook||"",
       instagram:doc.instagram||"",
       whatsapp:doc.whatsapp||"",
