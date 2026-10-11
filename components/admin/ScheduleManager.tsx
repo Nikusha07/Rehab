@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 type Specialist={_id:string;name:string;title?:string;isActive:boolean};
 type Hour={_id?:string;specialistId:string;weekday:number;openTime:string;closeTime:string;isDayOff:boolean};
 const dayNames=["კვირა","ორშაბათი","სამშაბათი","ოთხშაბათი","ხუთშაბათი","პარასკევი","შაბათი"];
-const defaultRows=()=>dayNames.map((_,weekday)=>({weekday,openTime:"10:00",closeTime:"18:00",isDayOff:weekday===0}));
+const defaultRows=()=>dayNames.map((_,weekday)=>({weekday,openTime:"09:00",closeTime:"18:00",isDayOff:weekday===0}));
 
 export default function ScheduleManager(){
  const [specialists,setSpecialists]=useState<Specialist[]>([]);const [hours,setHours]=useState<Hour[]>([]);const [selected,setSelected]=useState("");const [rows,setRows]=useState(defaultRows());const [busy,setBusy]=useState(false);const [message,setMessage]=useState("");
