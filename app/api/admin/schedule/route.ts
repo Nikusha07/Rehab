@@ -15,7 +15,10 @@ async function auth(request:NextRequest){return verifyAdminToken(request.cookies
 export async function GET(request:NextRequest){
  if(!(await auth(request)))return NextResponse.json({ok:false},{status:401});
  await dbConnect();
- await WorkingHours.updateMany({openTime:"10:00",closeTime:"18:00"},{$set:{openTime:"09:00"}});
+ await WorkingHours.updateMany(
+   {$or:[{scheduleVersion:{$exists:false}},{scheduleVersion:{$lt:1}}]},
+   {$set:{openTime:"09:00",closeTime:"18:00",scheduleVersion:1}}
+ );
  const [specialists,hours]=await Promise.all([Specialist.find({}).sort({sortOrder:1,name:1}).lean(),WorkingHours.find({}).sort({weekday:1}).lean()]);
  return NextResponse.json({ok:true,specialists,hours});
 }
@@ -28,7 +31,7 @@ export async function PUT(request:NextRequest){
  await dbConnect();
  const exists=await Specialist.exists({_id:parsed.data.specialistId});
  if(!exists)return NextResponse.json({ok:false},{status:404});
- await WorkingHours.bulkWrite(parsed.data.rows.map(row=>({updateOne:{filter:{specialistId:parsed.data.specialistId,weekday:row.weekday},update:{$set:{openTime:row.openTime,closeTime:row.closeTime,isDayOff:row.isDayOff}},upsert:true}})));
+ await WorkingHours.bulkWrite(parsed.data.rows.map(row=>({updateOne:{filter:{specialistId:parsed.data.specialistId,weekday:row.weekday},update:{$set:{openTime:row.openTime,closeTime:row.closeTime,isDayOff:row.isDayOff,scheduleVersion:1}},upsert:true}})));
  const hours=await WorkingHours.find({specialistId:parsed.data.specialistId}).sort({weekday:1}).lean();
  return NextResponse.json({ok:true,hours});
 }
