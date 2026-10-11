@@ -2,6 +2,7 @@ import { SITE } from "@/lib/config";
 import { addDays, minutesToTime, nowInTbilisi, timeToMinutes, weekdayOf } from "@/lib/time";
 import BlockedDate from "@/models/BlockedDate";
 import SlotLock from "@/models/SlotLock";
+import Booking from "@/models/Booking";
 import Specialist from "@/models/Specialist";
 import WorkingHours from "@/models/WorkingHours";
 
@@ -28,7 +29,15 @@ export async function getAvailability(date: string, specialistId: string, durati
 
   const lockFilter: Record<string, unknown> = { specialistId, date };
   if (ignoreBookingId) lockFilter.bookingId = { $ne: ignoreBookingId };
-  const locks = await SlotLock.find(lockFilter).select("time -_id").lean();
+
+  const bookingFilter: Record<string, unknown> = { specialistId, date, status: "confirmed" };
+  if (ignoreBookingId) bookingFilter._id = { $ne: ignoreBookingId };
+
+  const [locks, bookings] = await Promise.all([
+    SlotLock.find(lockFilter).select("time -_id").lean(),
+    Booking.find(bookingFilter).select("time durationMinutes -_id").lean(),
+  ]);
+
   const lockedTimes = new Set(locks.map((x) => x.time));
   const start = timeToMinutes(schedule.openTime);
   const end = timeToMinutes(schedule.closeTime);
@@ -37,11 +46,24 @@ export async function getAvailability(date: string, specialistId: string, durati
   for (let minute = start; minute + durationMinutes <= end; minute += SITE.slotMinutes) {
     const time = minutesToTime(minute);
     const past = date === now.date && time <= now.time;
-    const blocks = Math.ceil(durationMinutes / SITE.slotMinutes);
-    let collision = false;
+    const candidateEnd = minute + durationMinutes;
+
+    const overlapsBooking = bookings.some((booking: any) => {
+      const bookedStart = timeToMinutes(booking.time);
+      const bookedEnd = bookedStart + Number(booking.durationMinutes || 0);
+      return minute < bookedEnd && candidateEnd > bookedStart;
+    });
+
+    const blocks = Math.ceil(durationMinutes / SITE.lockMinutes);
+    let lockCollision = false;
     for (let i = 0; i < blocks; i++) {
-      if (lockedTimes.has(minutesToTime(minute + i * SITE.slotMinutes))) collision = true;
+      if (lockedTimes.has(minutesToTime(minute + i * SITE.lockMinutes))) {
+        lockCollision = true;
+        break;
+      }
     }
+
+    const collision = overlapsBooking || lockCollision;
     slots.push({ time, available: !past && !collision, reason: past ? "წარსული დრო" : collision ? "დაკავებულია" : undefined });
   }
 
