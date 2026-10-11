@@ -15,6 +15,7 @@ async function auth(request:NextRequest){return verifyAdminToken(request.cookies
 export async function GET(request:NextRequest){
  if(!(await auth(request)))return NextResponse.json({ok:false},{status:401});
  await dbConnect();
+ await WorkingHours.updateMany({openTime:"10:00",closeTime:"18:00"},{$set:{openTime:"09:00"}});
  const [specialists,hours]=await Promise.all([Specialist.find({}).sort({sortOrder:1,name:1}).lean(),WorkingHours.find({}).sort({weekday:1}).lean()]);
  return NextResponse.json({ok:true,specialists,hours});
 }
