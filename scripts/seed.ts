@@ -31,7 +31,7 @@ async function run(mongoUri: string) {
   for (let weekday = 0; weekday <= 6; weekday++) {
     await WorkingHours.updateOne(
       { specialistId: specialist._id, weekday },
-      { $setOnInsert: { specialistId: specialist._id, weekday, openTime: "10:00", closeTime: "18:00", isDayOff: weekday === 0 } },
+      { $setOnInsert: { specialistId: specialist._id, weekday, openTime: "09:00", closeTime: "18:00", isDayOff: weekday === 0 } },
       { upsert: true }
     );
   }
