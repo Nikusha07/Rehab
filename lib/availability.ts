@@ -18,8 +18,12 @@ export async function getAvailability(date: string, specialistId: string, durati
   if (blocked) return { ok: true, blocked: true, message: blocked.title || "ამ დღეს ჩაწერა შეზღუდულია.", slots: [] };
 
   const weekday = weekdayOf(date);
-  const wh = await WorkingHours.findOne({ specialistId, weekday }).lean();
-  const schedule = wh || { openTime: "10:00", closeTime: "18:00", isDayOff: weekday === 0 };
+  let wh: any = await WorkingHours.findOne({ specialistId, weekday }).lean();
+  if (wh && wh.openTime === "10:00" && wh.closeTime === "18:00") {
+    await WorkingHours.updateOne({ _id: wh._id }, { $set: { openTime: "09:00" } }).catch(() => undefined);
+    wh = { ...wh, openTime: "09:00" };
+  }
+  const schedule = wh || { openTime: "09:00", closeTime: "18:00", isDayOff: weekday === 0 };
   if (schedule.isDayOff) return { ok: true, blocked: true, message: "ამ დღეს სპეციალისტს სამუშაო დღე არ აქვს.", slots: [] };
 
   const lockFilter: Record<string, unknown> = { specialistId, date };
