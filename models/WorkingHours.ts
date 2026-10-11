@@ -4,7 +4,7 @@ const WorkingHoursSchema = new Schema(
   {
     specialistId: { type: Schema.Types.ObjectId, ref: "Specialist", required: true, index: true },
     weekday: { type: Number, required: true, min: 0, max: 6 },
-    openTime: { type: String, default: "10:00" },
+    openTime: { type: String, default: "09:00" },
     closeTime: { type: String, default: "18:00" },
     isDayOff: { type: Boolean, default: false },
   },
