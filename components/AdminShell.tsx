@@ -22,17 +22,21 @@ const navItems: { href: string; label: string; icon: string; roles: Role[] }[] =
 ];
 const roleLabels: Record<Role,string> = { owner: "Owner", reception: "Reception", doctor: "Doctor" };
 
-export default function AdminShell({ username, children }: { username: string; children: React.ReactNode }) {
+export default function AdminShell({ username, accessRole, children }: { username: string; accessRole?: Role; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [role, setRole] = useState<Role>("doctor");
+  const [role, setRole] = useState<Role>(accessRole && ["owner","reception","doctor"].includes(accessRole) ? accessRole : "doctor");
 
   useEffect(() => {
+    if (accessRole && ["owner","reception","doctor"].includes(accessRole)) {
+      setRole(accessRole);
+      return;
+    }
     fetch("/api/admin/me", { cache: "no-store" }).then((r) => r.json()).then((d) => {
       if (["owner","reception","doctor"].includes(d.role)) setRole(d.role);
     }).catch(() => undefined);
-  }, []);
+  }, [accessRole]);
 
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
