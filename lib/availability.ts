@@ -20,9 +20,12 @@ export async function getAvailability(date: string, specialistId: string, durati
 
   const weekday = weekdayOf(date);
   let wh: any = await WorkingHours.findOne({ specialistId, weekday }).lean();
-  if (wh && wh.openTime === "10:00" && wh.closeTime === "18:00") {
-    await WorkingHours.updateOne({ _id: wh._id }, { $set: { openTime: "09:00" } }).catch(() => undefined);
-    wh = { ...wh, openTime: "09:00" };
+  if (wh && Number(wh.scheduleVersion || 0) < 1) {
+    await WorkingHours.updateOne(
+      { _id: wh._id },
+      { $set: { openTime: "09:00", closeTime: "18:00", scheduleVersion: 1 } }
+    ).catch(() => undefined);
+    wh = { ...wh, openTime: "09:00", closeTime: "18:00", scheduleVersion: 1 };
   }
   const schedule = wh || { openTime: "09:00", closeTime: "18:00", isDayOff: weekday === 0 };
   if (schedule.isDayOff) return { ok: true, blocked: true, message: "ამ დღეს სპეციალისტს სამუშაო დღე არ აქვს.", slots: [] };
