@@ -56,19 +56,20 @@ export async function GET(request: NextRequest) {
   const compactMapQuery = savedMapQuery.split(" ").join("");
   const mapQuery = !savedMapQuery || ["42.33825,43.40750", "42.3382498,43.4075005"].includes(compactMapQuery) ? SITE.mapQuery : savedMapQuery;
 
+  const configVersion = Number(rawItem.configVersion || 0);
   const savedPhone = String(rawItem.phone || "").replace(/\D/g, "");
-  const phone = !savedPhone || savedPhone === "599000000" ? SITE.phone : savedPhone;
+  const phone = configVersion < 1 || !savedPhone || savedPhone === "599000000" ? SITE.phone : savedPhone;
 
   const savedHours = String(rawItem.hours || "").trim();
   const compactHours = savedHours.replace(/\s/g, "");
-  const hours = !savedHours || ["10:00–18:00", "10:00-18:00", "10:00—18:00"].includes(compactHours) ? SITE.hours : savedHours;
+  const hours = configVersion < 1 || !savedHours || ["10:00–18:00", "10:00-18:00", "10:00—18:00"].includes(compactHours) ? SITE.hours : savedHours;
 
-  const item = { ...rawItem, mapQuery, phone, hours };
+  const item = { ...rawItem, mapQuery, phone, hours, configVersion: 1 };
 
-  if (doc && (phone !== savedPhone || hours !== savedHours || mapQuery !== savedMapQuery)) {
+  if (doc && (configVersion < 1 || phone !== savedPhone || hours !== savedHours || mapQuery !== savedMapQuery)) {
     await SiteSetting.updateOne(
       { key: "main" },
-      { $set: { phone, hours, mapQuery } }
+      { $set: { phone, hours, mapQuery, configVersion: 1 } }
     ).catch(() => undefined);
   }
 
@@ -102,7 +103,7 @@ export async function PUT(request: NextRequest) {
   await dbConnect();
   const item = await SiteSetting.findOneAndUpdate(
     { key: "main" },
-    { $set: { ...parsed.data, key: "main" } },
+    { $set: { ...parsed.data, key: "main", configVersion: 1 } },
     { returnDocument: "after", upsert: true, runValidators: true }
   );
 
