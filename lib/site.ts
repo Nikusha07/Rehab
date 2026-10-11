@@ -22,19 +22,21 @@ export async function getSiteConfig():Promise<SiteConfig>{
     const shouldMigrateMap = !savedMapQuery || legacyMapQueries.has(compactMapQuery);
     const mapQuery = shouldMigrateMap ? SITE.mapQuery : savedMapQuery;
 
+    const configVersion = Number(doc.configVersion || 0);
     const savedPhone = String(doc.phone || "").replace(/\D/g, "");
-    const shouldMigratePhone = !savedPhone || savedPhone === "599000000";
+    const shouldMigratePhone = configVersion < 1 || !savedPhone || savedPhone === "599000000";
     const phone = shouldMigratePhone ? SITE.phone : savedPhone;
 
     const savedHours = String(doc.hours || "").trim();
     const compactHours = savedHours.replace(/\s/g, "");
-    const shouldMigrateHours = !savedHours || ["10:00–18:00", "10:00-18:00", "10:00—18:00"].includes(compactHours);
+    const shouldMigrateHours = configVersion < 1 || !savedHours || ["10:00–18:00", "10:00-18:00", "10:00—18:00"].includes(compactHours);
     const hours = shouldMigrateHours ? SITE.hours : savedHours;
 
-    const migration: Record<string, string> = {};
+    const migration: Record<string, string | number> = {};
     if (shouldMigrateMap && savedMapQuery) migration.mapQuery = SITE.mapQuery;
-    if (shouldMigratePhone && savedPhone) migration.phone = SITE.phone;
-    if (shouldMigrateHours && savedHours) migration.hours = SITE.hours;
+    if (shouldMigratePhone) migration.phone = SITE.phone;
+    if (shouldMigrateHours) migration.hours = SITE.hours;
+    if (configVersion < 1) migration.configVersion = 1;
     if (Object.keys(migration).length) {
       await SiteSetting.updateOne({ key: "main" }, { $set: migration }).catch(() => undefined);
     }
