@@ -81,3 +81,60 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
   const item = await Booking.findById(id).populate({ path: "serviceId", select: "name durationMinutes price", model: Service }).populate({ path: "specialistId", select: "name title", model: Specialist }).lean();
   return NextResponse.json({ ok: true, item });
 }
+
+
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const auth = await verifyAdminToken(request.cookies.get(adminCookie)?.value);
+  if (!auth) return NextResponse.json({ ok: false }, { status: 401 });
+  if (!hasAdminPermission(auth, "bookings.write")) {
+    return NextResponse.json({ ok: false, message: "ამ როლს ჯავშნის წაშლის უფლება არ აქვს." }, { status: 403 });
+  }
+
+  const { id } = await context.params;
+  if (!mongoose.isValidObjectId(id)) {
+    return NextResponse.json({ ok: false, message: "არასწორი ჯავშნის ID." }, { status: 400 });
+  }
+
+  await dbConnect();
+  const existing: any = await Booking.findById(id).lean();
+  if (!existing) {
+    return NextResponse.json({ ok: false, message: "ჯავშანი ვერ მოიძებნა." }, { status: 404 });
+  }
+
+  const session = await mongoose.startSession();
+  try {
+    await session.withTransaction(async () => {
+      await SlotLock.deleteMany({ bookingId: id }).session(session);
+      const deleted = await Booking.deleteOne({ _id: id }).session(session);
+      if (!deleted.deletedCount) throw new Error("NOT_FOUND");
+    });
+  } catch (error: any) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
+      return NextResponse.json({ ok: false, message: "ჯავშანი ვერ მოიძებნა." }, { status: 404 });
+    }
+    console.error("booking delete failed", error);
+    return NextResponse.json({ ok: false, message: "ჯავშნის წაშლა ვერ მოხერხდა." }, { status: 500 });
+  } finally {
+    await session.endSession();
+  }
+
+  await writeAudit({
+    actor: String(auth.username || "admin"),
+    action: "booking.delete",
+    entity: "booking",
+    entityId: id,
+    summary: `ჯავშანი წაიშალა: ${existing.patientName}, ${existing.date} ${existing.time}`,
+    metadata: {
+      patientName: existing.patientName,
+      patientPhone: existing.patientPhone,
+      date: existing.date,
+      time: existing.time,
+      confirmationCode: existing.confirmationCode,
+      status: existing.status,
+      serviceId: String(existing.serviceId || ""),
+      specialistId: String(existing.specialistId || ""),
+    },
+  });
+
+  return NextResponse.json({ ok: true, deletedId: id });
+}
