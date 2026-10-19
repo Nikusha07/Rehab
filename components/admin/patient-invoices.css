@@ -1,0 +1,36 @@
+.patient-invoices { border-top: 1px solid #dce3eb; }
+.patient-invoices .invoice-fields { border: 0; padding: 0; margin: 20px 0; min-width: 0; }
+.patient-invoices .invoice-fields:disabled { opacity: .7; }
+.patient-invoices details { margin: 20px 0; }
+.patient-invoices summary { cursor: pointer; margin-bottom: 16px; }
+.patient-invoices .invoice-procedure { display: grid; grid-template-columns: minmax(130px, 2fr) minmax(70px, 1fr) minmax(70px, 1fr); align-items: end; gap: 10px; border-bottom: 1px solid #e2e8f0; padding: 16px 0; }
+.patient-invoices .invoice-help { font-size: 12px; margin-top: 12px; }
+.patient-invoices .invoice-preview-scroll { overflow: auto; background: #e9edf2; padding: 16px; }
+.invoice-paper { width: 210mm; min-height: 297mm; padding: 24mm 20mm; box-sizing: border-box; background: white; color: #171717; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.invoice-paper header { text-align: center; margin-bottom: 16mm; }
+.invoice-paper header h1 { font-size: 22px; color: #235576; margin: 0 0 8px; }
+.invoice-paper header h2 { font-size: 12px; color: #171717; margin: 0; }
+.invoice-paper .invoice-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 12mm; margin-bottom: 22mm; }
+.invoice-paper table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.invoice-paper th { font-size: 11px; font-weight: 400; text-align: right; padding: 0 5px 16px; }
+.invoice-paper td { padding: 8px 5px; text-align: right; vertical-align: top; }
+.invoice-paper th:first-child,.invoice-paper td:first-child { text-align: left; width: 34%; }
+.invoice-paper tr { break-inside: avoid; }
+.invoice-paper .invoice-total { display: flex; justify-content: space-between; margin-top: 6px; break-inside: avoid; }
+.invoice-paper .invoice-total strong { color: #235576; }
+.invoice-paper .invoice-bank { margin-top: 18mm; font-size: 17px; break-inside: avoid; }
+.invoice-paper .invoice-bank h2 { color: #235576; font-size: 21px; margin: 0 0 8px; }
+.invoice-paper footer { margin-top: 18mm; font-size: 16px; break-inside: avoid; }
+.invoice-paper .invoice-signature { display: inline-block; width: 45mm; border-bottom: 1px solid; }
+.invoice-paper .invoice-stamp { margin: 8mm auto 0; border: 1px dashed #9aa8b3; border-radius: 50%; width: 28mm; height: 28mm; display: grid; place-items: center; font-size: 10px; color: #718092; }
+@media print {
+  @page { size: A4; margin: 15mm 0; }
+  body:has(.invoice-paper) { background: white !important; }
+  body:has(.invoice-paper) * { visibility: hidden; }
+  body:has(.invoice-paper) .invoice-paper, body:has(.invoice-paper) .invoice-paper * { visibility: visible; }
+  body:has(.invoice-paper) .adm-sidebar, body:has(.invoice-paper) .adm-topbar, body:has(.invoice-paper) .invoice-controls { display: none !important; }
+  body:has(.invoice-paper) .adm-shell, body:has(.invoice-paper) .adm-workspace, body:has(.invoice-paper) .adm-content, body:has(.invoice-paper) .adm-patient-layout, body:has(.invoice-paper) .adm-patient-detail, body:has(.invoice-paper) .patient-invoices, body:has(.invoice-paper) .invoice-preview-scroll { display: block !important; width: auto !important; margin: 0 !important; padding: 0 !important; border: 0 !important; overflow: visible !important; box-shadow: none !important; }
+  body:has(.invoice-paper) .adm-content > :not(.adm-patient-layout), body:has(.invoice-paper) .adm-patient-layout > :not(.adm-patient-detail), body:has(.invoice-paper) .adm-patient-detail > :not(.patient-invoices) { display: none !important; }
+  .invoice-paper { width: 210mm; min-height: 0; padding: 9mm 20mm; margin: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .invoice-paper thead { display: table-header-group; }
+}

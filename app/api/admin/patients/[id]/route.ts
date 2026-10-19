@@ -8,8 +8,9 @@ import Patient from "@/models/Patient";
 import Booking from "@/models/Booking";
 import Service from "@/models/Service";
 import Specialist from "@/models/Specialist";
+import { patientFields } from "@/lib/invoice";
 
-const updateSchema=z.object({name:z.string().trim().min(2).max(120).optional(),email:z.string().trim().max(160).optional(),notes:z.string().trim().max(3000).optional()});
+const updateSchema=patientFields.partial();
 async function auth(request:NextRequest){return verifyAdminToken(request.cookies.get(adminCookie)?.value)}
 
 export async function GET(request:NextRequest,context:{params:Promise<{id:string}>}){

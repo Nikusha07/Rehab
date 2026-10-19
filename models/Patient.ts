@@ -6,6 +6,8 @@ const PatientSchema = new Schema(
     phone: { type: String, required: true, unique: true, index: true },
     email: { type: String, default: "" },
     notes: { type: String, default: "" },
+    personalId: { type: String, default: "" },
+    address: { type: String, default: "" },
   },
   { timestamps: true }
 );
