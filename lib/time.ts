@@ -37,6 +37,7 @@ export function minutesToTime(value: number) {
 
 export function slotKeys(specialistId: string, date: string, time: string, durationMinutes: number, step = 30) {
   const start = timeToMinutes(time);
+  step = 1; // Serialize arbitrary intervals at minute precision.
   const blocks = Math.ceil(durationMinutes / step);
   return Array.from({ length: blocks }, (_, i) => `${specialistId}|${date}|${minutesToTime(start + i * step)}`);
 }

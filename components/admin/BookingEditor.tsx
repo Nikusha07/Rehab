@@ -1,5 +1,6 @@
 "use client";
 
+import { minutesToTime, timeToMinutes } from "@/lib/time";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Service = { _id: string; name: string; durationMinutes: number; price?: number | null };
@@ -11,6 +12,7 @@ export type EditableBooking = {
   patientPhone: string;
   date: string;
   time: string;
+  durationMinutes?: number;
   notes?: string;
   status: string;
   serviceId?: { _id?: string; name?: string };
@@ -42,6 +44,7 @@ export default function BookingEditor({
   const [specialistId, setSpecialistId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [notes, setNotes] = useState("");
   const [slots, setSlots] = useState<Slot[]>([]);
   const [slotMessage, setSlotMessage] = useState("");
@@ -67,6 +70,7 @@ export default function BookingEditor({
     setSpecialistId(booking?.specialistId?._id || "");
     setDate(booking?.date || "");
     setTime(booking?.time || "");
+    setEndTime(booking ? minutesToTime(timeToMinutes(booking.time) + (booking.durationMinutes || 30)) : "");
     setNotes(booking?.notes || "");
     setError("");
   }, [open, booking]);
@@ -100,9 +104,10 @@ export default function BookingEditor({
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
+    if (!endTime || endTime <= time) return setError("მიუთითეთ დასრულების დრო დაწყების შემდეგ.");
     if (!time) return setError("აირჩიეთ ვიზიტის დრო.");
     setBusy(true);
-    const payload = { patientName, patientPhone, serviceId, specialistId, date, time, notes };
+    const payload = { patientName, patientPhone, serviceId, specialistId, date, time, endTime, notes };
     const response = await fetch(booking ? `/api/admin/bookings/${booking._id}` : "/api/admin/bookings", {
       method: booking ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -132,7 +137,7 @@ export default function BookingEditor({
         </div>
         <label className="adm-field"><span>თარიღი</span><input type="date" min={todayInput()} value={date} onChange={(e) => { setDate(e.target.value); setTime(""); }} required /></label>
 
-        <div className="adm-slot-box">
+        <div className="adm-form-row"><label className="adm-field"><span>დაწყება</span><input type="time" step={60} value={time} onChange={(e) => setTime(e.target.value)} required /></label><label className="adm-field"><span>დასრულება</span><input type="time" step={60} value={endTime} onChange={(e) => setEndTime(e.target.value)} required /></label></div><p className="adm-help">ჩაწერეთ ზუსტი დრო. ეს მონაკვეთი ონლაინ ჩაწერისთვის დაიბლოკება.</p><div className="adm-slot-box">
           <div className="adm-slot-box-head"><b>დრო</b><small>{slotMessage}</small></div>
           {!serviceId || !specialistId || !date ? <p className="adm-help">ჯერ აირჩიეთ სერვისი, სპეციალისტი და თარიღი.</p> :
             <div className="adm-slot-grid">

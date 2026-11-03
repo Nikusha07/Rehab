@@ -7,7 +7,7 @@ import { dbConnect } from "@/lib/db";
 import { getAvailability } from "@/lib/availability";
 import { SITE } from "@/lib/config";
 import { sendBookingSms } from "@/lib/sms";
-import { slotKeys } from "@/lib/time";
+import { slotKeys, timeToMinutes } from "@/lib/time";
 import Booking from "@/models/Booking";
 import Patient from "@/models/Patient";
 import Service from "@/models/Service";
@@ -22,7 +22,8 @@ const bodySchema = z.object({
   serviceId: z.string().refine((v) => mongoose.isValidObjectId(v)).optional(),
   specialistId: z.string().refine((v) => mongoose.isValidObjectId(v)).optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
+  time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
   notes: z.string().trim().max(1000).optional(),
 }).refine((value) => Object.keys(value).length > 0);
 
@@ -45,11 +46,13 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
   const date = parsed.data.date ?? existing.date;
   const time = parsed.data.time ?? existing.time;
   const notes = parsed.data.notes ?? existing.notes ?? "";
-  const scheduleChanged = serviceId !== String(existing.serviceId) || specialistId !== String(existing.specialistId) || date !== existing.date || time !== existing.time;
+  const durationMinutes = parsed.data.endTime ? timeToMinutes(parsed.data.endTime) - timeToMinutes(time) : existing.durationMinutes;
+  if (durationMinutes <= 0) return NextResponse.json({ ok: false, message: "დასრულების დრო დაწყების შემდეგ უნდა იყოს." }, { status: 400 });
+  const scheduleChanged = durationMinutes !== existing.durationMinutes || serviceId !== String(existing.serviceId) || specialistId !== String(existing.specialistId) || date !== existing.date || time !== existing.time;
   const [service, specialist] = await Promise.all([Service.findById(serviceId).lean(), Specialist.findById(specialistId).lean()]);
   if (!service || !specialist) return NextResponse.json({ ok: false, message: "სერვისი ან სპეციალისტი ვერ მოიძებნა." }, { status: 404 });
   if (nextStatus === "confirmed" && (scheduleChanged || existing.status !== "confirmed")) {
-    const availability = await getAvailability(date, specialistId, service.durationMinutes, id);
+    const availability = await getAvailability(date, specialistId, durationMinutes, id, time);
     const selected = availability.slots?.find((slot: { time: string; available: boolean }) => slot.time === time);
     if (!availability.ok || !selected?.available) return NextResponse.json({ ok: false, message: availability.message || "არჩეული დრო მიუწვდომელია." }, { status: 409 });
   }
@@ -61,10 +64,10 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
       const mustRebuildLocks = scheduleChanged || booking.status !== nextStatus;
       if (mustRebuildLocks) await SlotLock.deleteMany({ bookingId: booking._id }).session(session);
       if (nextStatus === "confirmed" && mustRebuildLocks) {
-        const keys = slotKeys(specialistId, date, time, service.durationMinutes, SITE.lockMinutes);
+        const keys = slotKeys(specialistId, date, time, durationMinutes, SITE.lockMinutes);
         await SlotLock.insertMany(keys.map((key) => ({ key, bookingId: booking._id, specialistId, date, time: key.split("|").at(-1) })), { session, ordered: true });
       }
-      booking.patientId = patient._id; booking.patientName = patientName; booking.patientPhone = patientPhone; booking.serviceId = serviceId; booking.specialistId = specialistId; booking.date = date; booking.time = time; booking.durationMinutes = service.durationMinutes; booking.notes = notes; booking.status = nextStatus;
+      booking.patientId = patient._id; booking.patientName = patientName; booking.patientPhone = patientPhone; booking.serviceId = serviceId; booking.specialistId = specialistId; booking.date = date; booking.time = time; booking.durationMinutes = durationMinutes; booking.notes = notes; booking.status = nextStatus;
       await booking.save({ session });
     });
   } catch (error: any) {

@@ -6,7 +6,7 @@ import Booking from "@/models/Booking";
 import Specialist from "@/models/Specialist";
 import WorkingHours from "@/models/WorkingHours";
 
-export async function getAvailability(date: string, specialistId: string, durationMinutes: number, ignoreBookingId?: string) {
+export async function getAvailability(date: string, specialistId: string, durationMinutes: number, ignoreBookingId?: string, requestedTime?: string) {
   const now = nowInTbilisi();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < now.date || date > addDays(now.date, SITE.bookingDaysAhead)) {
     return { ok: false, message: "ამ თარიღზე ჩაწერა შეუძლებელია.", slots: [] };
@@ -46,7 +46,7 @@ export async function getAvailability(date: string, specialistId: string, durati
   const end = timeToMinutes(schedule.closeTime);
   const slots: { time: string; available: boolean; reason?: string }[] = [];
 
-  for (let minute = start; minute + durationMinutes <= end; minute += SITE.slotMinutes) {
+  for (let minute = requestedTime ? timeToMinutes(requestedTime) : start; minute >= start && minute + durationMinutes <= end; minute += requestedTime ? 1440 : SITE.slotMinutes) {
     const time = minutesToTime(minute);
     const past = date === now.date && time <= now.time;
     const candidateEnd = minute + durationMinutes;
@@ -57,10 +57,10 @@ export async function getAvailability(date: string, specialistId: string, durati
       return minute < bookedEnd && candidateEnd > bookedStart;
     });
 
-    const blocks = Math.ceil(durationMinutes / SITE.lockMinutes);
+    const blocks = durationMinutes;
     let lockCollision = false;
     for (let i = 0; i < blocks; i++) {
-      if (lockedTimes.has(minutesToTime(minute + i * SITE.lockMinutes))) {
+      if (lockedTimes.has(minutesToTime(minute + i))) {
         lockCollision = true;
         break;
       }

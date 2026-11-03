@@ -8,7 +8,7 @@ import { dbConnect } from "@/lib/db";
 import { getAvailability } from "@/lib/availability";
 import { SITE } from "@/lib/config";
 import { sendBookingSms } from "@/lib/sms";
-import { slotKeys } from "@/lib/time";
+import { slotKeys, timeToMinutes } from "@/lib/time";
 import Booking from "@/models/Booking";
 import Patient from "@/models/Patient";
 import Service from "@/models/Service";
@@ -24,7 +24,8 @@ const createSchema = z.object({
   serviceId: z.string().refine((v) => mongoose.isValidObjectId(v)),
   specialistId: z.string().refine((v) => mongoose.isValidObjectId(v)),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  time: z.string().regex(/^\d{2}:\d{2}$/),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
+  time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
   notes: z.string().trim().max(1000).optional().default(""),
 });
 function confirmationCode() { return randomBytes(5).toString("hex").slice(0, 8).toUpperCase(); }
@@ -61,16 +62,18 @@ export async function POST(request: NextRequest) {
   const { patientName, patientPhone, serviceId, specialistId, date, time, notes } = parsed.data;
   const [service, specialist] = await Promise.all([Service.findOne({ _id: serviceId, isActive: true }).lean(), Specialist.findOne({ _id: specialistId, isActive: true }).lean()]);
   if (!service || !specialist) return NextResponse.json({ ok: false, message: "მომსახურება ან სპეციალისტი მიუწვდომელია." }, { status: 404 });
-  const availability = await getAvailability(date, specialistId, service.durationMinutes);
+  const durationMinutes = parsed.data.endTime ? timeToMinutes(parsed.data.endTime) - timeToMinutes(time) : service.durationMinutes;
+  if (durationMinutes <= 0) return NextResponse.json({ ok: false, message: "დასრულების დრო დაწყების შემდეგ უნდა იყოს." }, { status: 400 });
+  const availability = await getAvailability(date, specialistId, durationMinutes, undefined, time);
   const selected = availability.slots?.find((slot: { time: string; available: boolean }) => slot.time === time);
   if (!availability.ok || !selected?.available) return NextResponse.json({ ok: false, message: "ეს დრო უკვე დაკავებულია ან მიუწვდომელია." }, { status: 409 });
   const session = await mongoose.startSession(); let booking: any; const code = confirmationCode();
   try {
     await session.withTransaction(async () => {
       const patient = await Patient.findOneAndUpdate({ phone: patientPhone }, { $set: { name: patientName } }, { upsert: true, new: true, session, setDefaultsOnInsert: true });
-      const created = await Booking.create([{ patientId: patient._id, patientName, patientPhone, serviceId, specialistId, date, time, durationMinutes: service.durationMinutes, notes, confirmationCode: code, source: "admin" }], { session });
+      const created = await Booking.create([{ patientId: patient._id, patientName, patientPhone, serviceId, specialistId, date, time, durationMinutes, notes, confirmationCode: code, source: "admin" }], { session });
       booking = created[0];
-      const keys = slotKeys(specialistId, date, time, service.durationMinutes, SITE.lockMinutes);
+      const keys = slotKeys(specialistId, date, time, durationMinutes, SITE.lockMinutes);
       await SlotLock.insertMany(keys.map((key) => ({ key, bookingId: booking._id, specialistId, date, time: key.split("|").at(-1) })), { session, ordered: true });
     });
   } catch (error: any) {
