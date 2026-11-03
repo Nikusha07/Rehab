@@ -19,10 +19,22 @@ import "./booking-final-v3.css";
 import "./mobile-menu-fix.css";
 
 export const metadata: Metadata = {
-  title: "რეაბილიტაციის ცენტრი | ონლაინ ჩაწერა",
-  description: "სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი — ონლაინ ჩაწერა, სპეციალისტები და მომსახურებები.",
+  metadataBase: new URL("https://rehasackhere.ge"),
+  title: "რეაბილიტაციის ცენტრი საჩხერეში | Reha Sachkhere",
+  description: "Reha Sachkhere — სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი საჩხერეში. გაეცანით მომსახურებებს, სპეციალისტებს და დაჯავშნეთ ვიზიტი ონლაინ.",
+  icons: {
+    icon: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
+    apple: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
+  },
+  openGraph: {
+    type: "website", locale: "ka_GE", siteName: "Reha Sachkhere",
+    title: "რეაბილიტაციის ცენტრი საჩხერეში | Reha Sachkhere",
+    description: "სამკურნალო ფიზკულტურა და რეაბილიტაცია საჩხერეში. ინფორმაცია მომსახურებებზე და ონლაინ ჩაწერა.",
+    images: [{ url: "/icon.png", width: 512, height: 512, alt: "Reha Sachkhere — ცენტრის ლოგო" }],
+  },
+  twitter: { card: "summary", title: "Reha Sachkhere — რეაბილიტაცია საჩხერეში", images: ["/icon.png"] },
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "Rehab Center", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Reha Sachkhere", statusBarStyle: "default" },
   formatDetection: { telephone: true },
 };
 

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import BookingWizard from "@/components/BookingWizard";
 import Header from "@/components/Header";
@@ -5,6 +6,8 @@ import { getSiteConfig } from "@/lib/site";
 import { dbConnect } from "@/lib/db";
 import Service from "@/models/Service";
 import Specialist from "@/models/Specialist";
+
+export const metadata: Metadata = { alternates: { canonical: "https://rehasackhere.ge/" } };
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +43,15 @@ export default async function HomePage() {
     specialists = specialistDocs as any[];
   } catch {}
 
+  const origin = "https://rehasackhere.ge";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebSite", "@id": origin + "/#website", url: origin + "/", name: "Reha Sachkhere", alternateName: ["რეაბილიტაციის ცენტრი საჩხერეში", "rehasackhere"], inLanguage: "ka", publisher: { "@id": origin + "/#center" } },
+      { "@type": "MedicalClinic", "@id": origin + "/#center", name: site.centerName, alternateName: ["Reha Sachkhere", "rehasackhere"], url: origin + "/", logo: { "@type": "ImageObject", url: origin + "/icon.png", width: 512, height: 512 }, image: origin + "/rehab-hero.jpg", description: "სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი საჩხერეში. ონლაინ ჩაწერა ვიზიტზე.", telephone: site.phone.startsWith("+") ? site.phone : "+995" + site.phone, address: { "@type": "PostalAddress", addressLocality: "საჩხერე", addressCountry: "GE", streetAddress: site.address }, sameAs: [site.facebook, site.instagram].filter(value => /^https?:\/\//.test(value)) },
+    ],
+  };
+
   const phoneDisplay = site.phone.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4");
   const mapQuery = encodeURIComponent(site.mapQuery || site.address);
   const whatsappHref = site.whatsapp
@@ -51,15 +63,16 @@ export default async function HomePage() {
   return (
     <main id="top" className="public-site">
       <Header />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
 
       <section className="hero-section">
         <div className="hero-glow one" />
         <div className="hero-glow two" />
         <div className="container hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow"><i /> პროფესიული ზრუნვა ყოველდღიური მოძრაობისთვის</span>
-            <h1>აღდგენა იწყება <span>სწორი მოძრაობით.</span></h1>
-            <p>{site.tagline}. ინდივიდუალური მიდგომა, პროფესიული გუნდი და მარტივი ონლაინ ჩაწერა ერთ სივრცეში.</p>
+            <span className="eyebrow"><i /> Reha Sachkhere · რეაბილიტაციის ცენტრი საჩხერეში</span>
+            <h1>რეაბილიტაცია საჩხერეში — <span>აღდგენა სწორი მოძრაობით.</span></h1>
+            <p>Reha Sachkhere (rehasackhere.ge) — {site.tagline} საჩხერეში. ინდივიდუალური მიდგომა, პროფესიული გუნდი და მარტივი ონლაინ ჩაწერა ერთ სივრცეში.</p>
 
             <div className="hero-actions">
               <a className="button button-primary" href="#booking">ვიზიტზე ჩაწერა <span>→</span></a>
