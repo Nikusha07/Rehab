@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { minutesToTime, timeToMinutes } from "@/lib/time";
 import { useRouter } from "next/navigation";
 import BookingEditor, { EditableBooking } from "@/components/admin/BookingEditor";
 
@@ -84,18 +85,21 @@ export default function AdminDashboard() {
     const a = document.createElement("a"); a.href = url; a.download = `bookings-${today}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
-  function printToday() {
-    const rows = items.filter(x => x.date === today && x.status === "confirmed").sort((a, b) => a.time.localeCompare(b.time));
+  function printBookings(todayOnly = false) {
+    const rows = (todayOnly ? items.filter(x => x.date === today && x.status === "confirmed") : [...visible]).sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+    if (!rows.length) { setError("ამოსაბეჭდი ჩანაწერები არ არის."); return; }
+    const escape = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]!));
+    const title = todayOnly ? "დღევანდელი ვიზიტები" : "ჩაწერილი პაციენტების სია";
     const win = window.open("", "_blank", "width=900,height=700");
-    if (!win) return;
-    win.document.write(`<html><head><title>დღის სია ${today}</title><style>body{font-family:Arial,sans-serif;padding:28px;color:#173d42}h1{margin:0 0 6px}p{color:#667;margin:0 0 22px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}th{background:#eef6f3}@media print{button{display:none}}</style></head><body><h1>დღევანდელი ვიზიტები</h1><p>${today} • ${rows.length} ვიზიტი</p><table><thead><tr><th>დრო</th><th>პაციენტი</th><th>ტელეფონი</th><th>სერვისი</th><th>სპეციალისტი</th></tr></thead><tbody>${rows.map(x => `<tr><td>${x.time}</td><td>${x.patientName}</td><td>${x.patientPhone}</td><td>${x.serviceId?.name || "—"}</td><td>${x.specialistId?.name || "—"}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()</script></body></html>`);
+    if (!win) { setError("ამობეჭდვისთვის დაუშვით ახალი ფანჯრის გახსნა ბრაუზერში."); return; }
+    win.document.write(`<!doctype html><html lang="ka"><head><meta charset="utf-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:28px;color:#173d42}h1{margin:0 0 6px}p{color:#667;margin:0 0 22px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}th{background:#eef6f3}@page{size:A4 landscape;margin:12mm}thead{display:table-header-group}tr{break-inside:avoid}td{overflow-wrap:anywhere} @media print{button{display:none}}</style></head><body><h1>${title}</h1><p>${escape(todayOnly ? today : date || "ყველა ნაჩვენები თარიღი")} • ${rows.length} ვიზიტი • ${escape(todayOnly ? labels.confirmed : labels[filter] || "ყველა სტატუსი")} ${query ? " • ძიება: " + escape(query) : ""}</p><table><thead><tr><th>თარიღი</th><th>დრო</th><th>პაციენტი</th><th>ტელეფონი</th><th>სერვისი</th><th>სპეციალისტი</th><th>სტატუსი</th></tr></thead><tbody>${rows.map(x => `<tr><td>${escape(x.date)}</td><td>${escape(x.time)}${x.durationMinutes ? " – " + escape(minutesToTime(timeToMinutes(x.time) + x.durationMinutes)) : ""}</td><td>${escape(x.patientName)}</td><td>${escape(x.patientPhone)}</td><td>${escape(x.serviceId?.name || "—")}</td><td>${escape(x.specialistId?.name || "—")}</td><td>${escape(labels[x.status] || x.status)}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()</script></body></html>`);
     win.document.close();
   }
 
   return <>
     <div className="adm-page-head">
       <div><h1>ჯავშნების მართვა</h1><p>ჯავშნები, სტატუსები, პაციენტები, export და დღევანდელი დატვირთვა ერთ სივრცეში.</p></div>
-      <div className="adm-page-actions"><button className="adm-btn primary" onClick={openCreate}>+ ახალი ჯავშანი</button><button className="adm-btn" onClick={printToday}>დღის სია</button><button className="adm-btn" onClick={exportCsv}>CSV Export</button><a className="adm-btn" href="/admin/calendar">კალენდარი</a></div>
+      <div className="adm-page-actions"><button className="adm-btn primary" onClick={openCreate}>+ ახალი ჯავშანი</button><button className="adm-btn" onClick={() => printBookings(true)}>დღის სია</button><button className="adm-btn" onClick={() => printBookings()} disabled={loading || !visible.length}>სიის ამობეჭდვა</button><button className="adm-btn" onClick={exportCsv}>CSV Export</button><a className="adm-btn" href="/admin/calendar">კალენდარი</a></div>
     </div>
 
     <div className="adm-grid four">
@@ -119,3 +123,4 @@ export default function AdminDashboard() {
     <BookingEditor open={editorOpen} booking={editing} onClose={() => setEditorOpen(false)} onSaved={load} />
   </>;
 }
+
