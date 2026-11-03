@@ -1,11 +1,10 @@
 "use client";
 
 import { minutesToTime, timeToMinutes } from "@/lib/time";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type Service = { _id: string; name: string; durationMinutes: number; price?: number | null };
 type Specialist = { _id: string; name: string; title?: string };
-type Slot = { time: string; available: boolean; reason?: string };
 export type EditableBooking = {
   _id: string;
   patientName: string;
@@ -18,6 +17,16 @@ export type EditableBooking = {
   serviceId?: { _id?: string; name?: string };
   specialistId?: { _id?: string; name?: string; title?: string };
 };
+
+function normalizeTime(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (/^\d{3,4}$/.test(digits)) {
+    const padded = digits.padStart(4, "0");
+    const result = padded.slice(0, 2) + ":" + padded.slice(2);
+    if (/^([01]\d|2[0-3]):[0-5]\d$/.test(result)) return result;
+  }
+  return value;
+}
 
 function todayInput() {
   const d = new Date();
@@ -46,8 +55,6 @@ export default function BookingEditor({
   const [time, setTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [notes, setNotes] = useState("");
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [slotMessage, setSlotMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -75,39 +82,18 @@ export default function BookingEditor({
     setError("");
   }, [open, booking]);
 
-  useEffect(() => {
-    if (!open || !serviceId || !specialistId || !date) {
-      setSlots([]);
-      setSlotMessage("");
-      return;
-    }
-    const controller = new AbortController();
-    setSlotMessage("იტვირთება...");
-    fetch(`/api/availability?date=${encodeURIComponent(date)}&specialistId=${serviceId ? encodeURIComponent(specialistId) : ""}&serviceId=${encodeURIComponent(serviceId)}`, {
-      cache: "no-store",
-      signal: controller.signal,
-    })
-      .then(async (r) => ({ ok: r.ok, data: await r.json() }))
-      .then(({ data }) => {
-        setSlots(data.slots || []);
-        setSlotMessage(data.message || (data.availableCount ? `თავისუფალია ${data.availableCount} დრო` : "თავისუფალი დრო არ არის"));
-      })
-      .catch((e) => { if (e.name !== "AbortError") setSlotMessage("დროების ჩატვირთვა ვერ მოხერხდა."); });
-    return () => controller.abort();
-  }, [open, serviceId, specialistId, date]);
-
-  const currentTimeAllowed = Boolean(booking && booking.date === date && booking.time === time && booking.serviceId?._id === serviceId && booking.specialistId?._id === specialistId);
-  const availableSlots = useMemo(() => slots.filter((x) => x.available), [slots]);
-
   if (!open) return null;
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    if (!endTime || endTime <= time) return setError("მიუთითეთ დასრულების დრო დაწყების შემდეგ.");
+    const startValue = normalizeTime(time);
+    const endValue = normalizeTime(endTime);
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(startValue) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(endValue)) return setError("ჩაწერეთ დრო 24-საათიანი ფორმატით, მაგალითად 10:10.");
+    if (!endValue || endValue <= startValue) return setError("მიუთითეთ დასრულების დრო დაწყების შემდეგ.");
     if (!time) return setError("აირჩიეთ ვიზიტის დრო.");
     setBusy(true);
-    const payload = { patientName, patientPhone, serviceId, specialistId, date, time, endTime, notes };
+    const payload = { patientName, patientPhone, serviceId, specialistId, date, time: startValue, endTime: endValue, notes };
     const response = await fetch(booking ? `/api/admin/bookings/${booking._id}` : "/api/admin/bookings", {
       method: booking ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -132,20 +118,27 @@ export default function BookingEditor({
           <label className="adm-field"><span>ტელეფონი</span><input value={patientPhone} onChange={(e) => setPatientPhone(e.target.value.replace(/\D/g, "").slice(0, 9))} inputMode="numeric" pattern="5[0-9]{8}" maxLength={9} required /></label>
         </div>
         <div className="adm-form-row">
-          <label className="adm-field"><span>სერვისი</span><select value={serviceId} onChange={(e) => { setServiceId(e.target.value); setTime(""); }} required><option value="">აირჩიეთ</option>{services.map((x) => <option key={x._id} value={x._id}>{x.name}{x.price != null ? ` — ${x.price} ₾` : ""}</option>)}</select></label>
-          <label className="adm-field"><span>სპეციალისტი</span><select value={specialistId} onChange={(e) => { setSpecialistId(e.target.value); setTime(""); }} required><option value="">აირჩიეთ</option>{specialists.map((x) => <option key={x._id} value={x._id}>{x.name}{x.title ? ` — ${x.title}` : ""}</option>)}</select></label>
+          <label className="adm-field"><span>სერვისი</span><select value={serviceId} onChange={(e) => { setServiceId(e.target.value); }} required><option value="">აირჩიეთ</option>{services.map((x) => <option key={x._id} value={x._id}>{x.name}{x.price != null ? ` — ${x.price} ₾` : ""}</option>)}</select></label>
+          <label className="adm-field"><span>სპეციალისტი</span><select value={specialistId} onChange={(e) => { setSpecialistId(e.target.value); }} required><option value="">აირჩიეთ</option>{specialists.map((x) => <option key={x._id} value={x._id}>{x.name}{x.title ? ` — ${x.title}` : ""}</option>)}</select></label>
         </div>
-        <label className="adm-field"><span>თარიღი</span><input type="date" min={todayInput()} value={date} onChange={(e) => { setDate(e.target.value); setTime(""); }} required /></label>
+        <label className="adm-field"><span>თარიღი</span><input type="date" min={todayInput()} value={date} onChange={(e) => { setDate(e.target.value); }} required /></label>
 
-        <div className="adm-form-row"><label className="adm-field"><span>დაწყება</span><input type="time" step={60} value={time} onChange={(e) => setTime(e.target.value)} required /></label><label className="adm-field"><span>დასრულება</span><input type="time" step={60} value={endTime} onChange={(e) => setEndTime(e.target.value)} required /></label></div><p className="adm-help">ჩაწერეთ ზუსტი დრო. ეს მონაკვეთი ონლაინ ჩაწერისთვის დაიბლოკება.</p><div className="adm-slot-box">
-          <div className="adm-slot-box-head"><b>დრო</b><small>{slotMessage}</small></div>
-          {!serviceId || !specialistId || !date ? <p className="adm-help">ჯერ აირჩიეთ სერვისი, სპეციალისტი და თარიღი.</p> :
-            <div className="adm-slot-grid">
-              {booking && currentTimeAllowed && !availableSlots.some((x) => x.time === booking.time) && <button type="button" className={`adm-slot ${time === booking.time ? "selected" : ""}`} onClick={() => setTime(booking.time)}>{booking.time}<small>მიმდინარე</small></button>}
-              {availableSlots.map((slot) => <button type="button" key={slot.time} className={`adm-slot ${time === slot.time ? "selected" : ""}`} onClick={() => setTime(slot.time)}>{slot.time}</button>)}
-            </div>
-          }
-        </div>
+        <fieldset className="adm-slot-box" style={{ margin: 0, minWidth: 0 }}>
+          <legend style={{ padding: "0 6px", fontWeight: 700 }}>ვიზიტის დრო</legend>
+          <div className="adm-form-row">
+            <label className="adm-field"><span>საიდან</span><input type="text" inputMode="numeric" placeholder="10:10" maxLength={5} value={time} onChange={(e) => setTime(e.target.value.replace(/[^0-9:]/g, ""))} onBlur={() => {
+              const value = normalizeTime(time);
+              setTime(value);
+              if (!endTime && /^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
+                const end = timeToMinutes(value) + (services.find((item) => item._id === serviceId)?.durationMinutes || 30);
+                if (end < 1440) setEndTime(minutesToTime(end));
+              }
+            }} aria-describedby="booking-time-help" autoComplete="off" required /></label>
+            <label className="adm-field"><span>სადამდე</span><input type="text" inputMode="numeric" placeholder="11:25" maxLength={5} value={endTime} onChange={(e) => setEndTime(e.target.value.replace(/[^0-9:]/g, ""))} onBlur={() => setEndTime(normalizeTime(endTime))} aria-describedby="booking-time-help" autoComplete="off" required /></label>
+          </div>
+          <p id="booking-time-help" className="adm-help">აკრიფეთ 24-საათიანი დრო: 10:10 ან 1010. დასრულების დრო შეგიძლიათ შეცვალოთ.</p>
+          {/^([01]\d|2[0-3]):[0-5]\d$/.test(normalizeTime(time)) && /^([01]\d|2[0-3]):[0-5]\d$/.test(normalizeTime(endTime)) && normalizeTime(endTime) > normalizeTime(time) && <p role="status" style={{ marginBottom: 0 }}><strong>{normalizeTime(time)} – {normalizeTime(endTime)}</strong> · {timeToMinutes(normalizeTime(endTime)) - timeToMinutes(normalizeTime(time))} წუთი</p>}
+        </fieldset>
 
         <label className="adm-field"><span>შენიშვნა</span><textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={1000} placeholder="არასავალდებულო ინფორმაცია" /></label>
         {error && <div className="adm-notice error">{error}</div>}
@@ -154,3 +147,4 @@ export default function BookingEditor({
     </section>
   </div>;
 }
+
