@@ -19,6 +19,7 @@ import SmsLog from "@/models/SmsLog";
 export const dynamic = "force-dynamic";
 
 const createSchema = z.object({
+  patientId: z.string().refine((v) => mongoose.isValidObjectId(v)).optional(),
   patientName: z.string().trim().min(2).max(120),
   patientPhone: z.string().transform((v) => v.replace(/\D/g, "")).refine((v) => /^5\d{8}$/.test(v)),
   serviceId: z.string().refine((v) => mongoose.isValidObjectId(v)),
@@ -28,6 +29,8 @@ const createSchema = z.object({
   time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
   notes: z.string().trim().max(1000).optional().default(""),
 });
+class SelectedPatientChanged extends Error {}
+
 function confirmationCode() { return randomBytes(5).toString("hex").slice(0, 8).toUpperCase(); }
 
 export async function GET(request: NextRequest) {
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
   const parsed = createSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, message: "შეამოწმეთ შევსებული ინფორმაცია." }, { status: 400 });
   await dbConnect();
-  const { patientName, patientPhone, serviceId, specialistId, date, time, notes } = parsed.data;
+  const { patientId, patientName, patientPhone, serviceId, specialistId, date, time, notes } = parsed.data;
   const [service, specialist] = await Promise.all([Service.findOne({ _id: serviceId, isActive: true }).lean(), Specialist.findOne({ _id: specialistId, isActive: true }).lean()]);
   if (!service || !specialist) return NextResponse.json({ ok: false, message: "მომსახურება ან სპეციალისტი მიუწვდომელია." }, { status: 404 });
   const durationMinutes = parsed.data.endTime ? timeToMinutes(parsed.data.endTime) - timeToMinutes(time) : service.durationMinutes;
@@ -70,13 +73,17 @@ export async function POST(request: NextRequest) {
   const session = await mongoose.startSession(); let booking: any; const code = confirmationCode();
   try {
     await session.withTransaction(async () => {
-      const patient = await Patient.findOneAndUpdate({ phone: patientPhone }, { $set: { name: patientName } }, { upsert: true, new: true, session, setDefaultsOnInsert: true });
+      const patient = patientId
+        ? await Patient.findOne({ _id: patientId, name: patientName, phone: patientPhone }).session(session)
+        : await Patient.findOneAndUpdate({ phone: patientPhone }, { $set: { name: patientName } }, { upsert: true, new: true, session, setDefaultsOnInsert: true });
+      if (!patient) throw new SelectedPatientChanged();
       const created = await Booking.create([{ patientId: patient._id, patientName, patientPhone, serviceId, specialistId, date, time, durationMinutes, notes, confirmationCode: code, source: "admin" }], { session });
       booking = created[0];
       const keys = slotKeys(specialistId, date, time, durationMinutes, SITE.lockMinutes);
       await SlotLock.insertMany(keys.map((key) => ({ key, bookingId: booking._id, specialistId, date, time: key.split("|").at(-1) })), { session, ordered: true });
     });
   } catch (error: any) {
+    if (error instanceof SelectedPatientChanged) return NextResponse.json({ ok: false, message: "პაციენტის მონაცემები შეიცვალა. მოძებნეთ და აირჩიეთ პაციენტი ხელახლა." }, { status: 409 });
     if (error?.code === 11000) return NextResponse.json({ ok: false, message: "ეს დრო უკვე სხვამ დაიკავა." }, { status: 409 });
     console.error("admin booking create failed", error); return NextResponse.json({ ok: false, message: "ჯავშნის შექმნა ვერ მოხერხდა." }, { status: 500 });
   } finally { await session.endSession(); }
