@@ -123,6 +123,19 @@
 }
 
 @media (max-width: 1100px) {
+  html.public-menu-open {
+    overflow-y: hidden;
+    overscroll-behavior-y: none;
+  }
+
+  /* A backdrop filter on the sticky header makes fixed descendants relative to it. */
+  .public-site .site-header {
+    --mobile-nav-top: max(80px, calc(env(safe-area-inset-top) + 70px));
+    background: #fffef4 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
   .public-site .header-inner {
     width: min(100% - 30px, 980px) !important;
     min-height: 72px !important;
@@ -205,25 +218,27 @@
     z-index: 301 !important;
     border: 0 !important;
     background: rgba(8, 43, 37, .30) !important;
-    backdrop-filter: blur(3px) !important;
-    -webkit-backdrop-filter: blur(3px) !important;
+    touch-action: none;
   }
 
   .public-site .main-nav {
     position: fixed !important;
     z-index: 305 !important;
-    top: max(80px, calc(env(safe-area-inset-top) + 70px)) !important;
+    top: var(--mobile-nav-top) !important;
     left: 14px !important;
     right: 14px !important;
     width: auto !important;
     height: auto !important;
-    max-height: min(72vh, 540px) !important;
+    max-height: min(540px, calc(100vh - var(--mobile-nav-top) - 12px)) !important;
+    max-height: min(540px, calc(100dvh - var(--mobile-nav-top) - max(12px, env(safe-area-inset-bottom)))) !important;
     margin: 0 !important;
     padding: 12px !important;
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 5px !important;
     overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
     border: 1px solid rgba(220,233,228,.97) !important;
     border-radius: 20px !important;
     background: rgba(255,255,255,.99) !important;
@@ -271,6 +286,10 @@
 }
 
 @media (max-width: 600px) {
+  .public-site .site-header {
+    --mobile-nav-top: max(76px, calc(env(safe-area-inset-top) + 66px));
+  }
+
   .public-site .header-inner {
     width: calc(100% - 24px) !important;
     min-height: 68px !important;
@@ -279,8 +298,8 @@
 
   .public-site .brand-logo,
   .public-site .brand img {
-    height: 46px !important;
-    max-width: 180px !important;
+    height: 54px !important;
+    max-width: 190px !important;
   }
 
   .public-site .menu-button {
@@ -290,7 +309,6 @@
   }
 
   .public-site .main-nav {
-    top: max(76px, calc(env(safe-area-inset-top) + 66px)) !important;
     left: 10px !important;
     right: 10px !important;
     border-radius: 18px !important;
@@ -300,7 +318,7 @@
 @media (max-width: 360px) {
   .public-site .brand-logo,
   .public-site .brand img {
-    height: 42px !important;
-    max-width: 158px !important;
+    height: 50px !important;
+    max-width: 176px !important;
   }
 }
