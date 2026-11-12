@@ -14,6 +14,12 @@ export async function GET(request:NextRequest){
  const q=(request.nextUrl.searchParams.get("q")||"").trim();
  const escaped=q.slice(0,120).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
  const filter=q?{$or:[{name:{$regex:escaped,$options:"i"}},{phone:{$regex:escaped}},{personalId:{$regex:escaped}}]}:{};
+ if (request.nextUrl.searchParams.get("mode") === "booking") {
+  if (!hasAdminPermission(auth, "bookings.write")) return NextResponse.json({ ok: false }, { status: 403 });
+  const items = escaped.length < 2 ? [] : await Patient.find({ name: { $regex: escaped, $options: "i" } })
+   .select("name phone personalId").sort({ name: 1, _id: 1 }).limit(10).lean();
+  return NextResponse.json({ ok: true, items }, { headers: { "Cache-Control": "no-store" } });
+ }
  const patients=await Patient.find(filter).sort({updatedAt:-1}).limit(300).lean();
  const ids=patients.map(p=>p._id);
  const stats=ids.length?await Booking.aggregate([{$match:{patientId:{$in:ids}}},{$group:{_id:"$patientId",visits:{$sum:1},confirmed:{$sum:{$cond:[{$eq:["$status","confirmed"]},1,0]}},completed:{$sum:{$cond:[{$eq:["$status","completed"]},1,0]}},lastDate:{$max:"$date"}}}]):[];

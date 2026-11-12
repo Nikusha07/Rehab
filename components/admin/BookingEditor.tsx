@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 
 type Service = { _id: string; name: string; durationMinutes: number; price?: number | null };
 type Specialist = { _id: string; name: string; title?: string };
+type PatientMatch = { _id: string; name: string; phone: string; personalId?: string };
 export type EditableBooking = {
   _id: string;
   patientName: string;
@@ -49,6 +50,9 @@ export default function BookingEditor({
   const [specialists, setSpecialists] = useState<Specialist[]>([]);
   const [patientName, setPatientName] = useState("");
   const [patientPhone, setPatientPhone] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<PatientMatch | null>(null);
+  const [patientMatches, setPatientMatches] = useState<PatientMatch[]>([]);
+  const [patientSearchStatus, setPatientSearchStatus] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [specialistId, setSpecialistId] = useState("");
   const [date, setDate] = useState("");
@@ -73,6 +77,9 @@ export default function BookingEditor({
     if (!open) return;
     setPatientName(booking?.patientName || "");
     setPatientPhone(booking?.patientPhone || "");
+    setSelectedPatient(null);
+    setPatientMatches([]);
+    setPatientSearchStatus("");
     setServiceId(booking?.serviceId?._id || "");
     setSpecialistId(booking?.specialistId?._id || "");
     setDate(booking?.date || "");
@@ -81,6 +88,32 @@ export default function BookingEditor({
     setNotes(booking?.notes || "");
     setError("");
   }, [open, booking]);
+
+  useEffect(() => {
+    const query = patientName.trim();
+    if (!open || booking || selectedPatient || query.length < 2) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({ mode: "booking", q: query });
+        const response = await fetch(`/api/admin/patients?${params}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Patient lookup failed");
+        const { items }: { items: PatientMatch[] } = await response.json();
+        if (controller.signal.aborted) return;
+        setPatientMatches(items);
+        setPatientSearchStatus(items.length ? "" : "პაციენტი ვერ მოიძებნა. შეგიძლიათ მონაცემები ხელით შეავსოთ.");
+      } catch {
+        if (!controller.signal.aborted) setPatientSearchStatus("პაციენტების ძებნა ვერ მოხერხდა.");
+      }
+    }, 250);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [open, booking, patientName, selectedPatient]);
 
   if (!open) return null;
 
@@ -93,7 +126,7 @@ export default function BookingEditor({
     if (!endValue || endValue <= startValue) return setError("მიუთითეთ დასრულების დრო დაწყების შემდეგ.");
     if (!time) return setError("აირჩიეთ ვიზიტის დრო.");
     setBusy(true);
-    const payload = { patientName, patientPhone, serviceId, specialistId, date, time: startValue, endTime: endValue, notes };
+    const payload = { patientName, patientPhone, patientId: selectedPatient?._id, serviceId, specialistId, date, time: startValue, endTime: endValue, notes };
     const response = await fetch(booking ? `/api/admin/bookings/${booking._id}` : "/api/admin/bookings", {
       method: booking ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -114,9 +147,29 @@ export default function BookingEditor({
       </div>
       <form className="adm-modal-body adm-form" onSubmit={submit}>
         <div className="adm-form-row">
-          <label className="adm-field"><span>სახელი და გვარი</span><input value={patientName} onChange={(e) => setPatientName(e.target.value)} minLength={2} maxLength={120} required /></label>
-          <label className="adm-field"><span>ტელეფონი</span><input value={patientPhone} onChange={(e) => setPatientPhone(e.target.value.replace(/\D/g, "").slice(0, 9))} inputMode="numeric" pattern="5[0-9]{8}" maxLength={9} required /></label>
+          <label className="adm-field"><span>სახელი და გვარი</span><input value={patientName} onChange={(e) => {
+            if (selectedPatient) setPatientPhone("");
+            setSelectedPatient(null);
+            setPatientMatches([]);
+            setPatientSearchStatus("");
+            setPatientName(e.target.value);
+          }} minLength={2} maxLength={120} required /></label>
+          <label className="adm-field"><span>ტელეფონი</span><input value={patientPhone} onChange={(e) => setPatientPhone(e.target.value.replace(/\D/g, "").slice(0, 9))} readOnly={Boolean(selectedPatient)} inputMode="numeric" pattern="5[0-9]{8}" maxLength={9} required /></label>
         </div>
+        {!booking && patientMatches.length > 0 && (
+          <div className="adm-field" role="group" aria-label="ნაპოვნი პაციენტები">
+            {patientMatches.map((patient) => (
+              <button className="adm-btn" key={patient._id} type="button" onClick={() => {
+                setSelectedPatient(patient);
+                setPatientName(patient.name);
+                setPatientPhone(patient.phone);
+                setPatientMatches([]);
+              }}>{patient.name} · {patient.phone}</button>
+            ))}
+          </div>
+        )}
+        {!booking && patientSearchStatus && <p className="adm-help" role="status">{patientSearchStatus}</p>}
+        {selectedPatient && <label className="adm-field"><span>პირადი ნომერი</span><input value={selectedPatient.personalId || ""} placeholder="მიუთითებელია" readOnly /></label>}
         <div className="adm-form-row">
           <label className="adm-field"><span>სერვისი</span><select value={serviceId} onChange={(e) => { setServiceId(e.target.value); }} required><option value="">აირჩიეთ</option>{services.map((x) => <option key={x._id} value={x._id}>{x.name}{x.price != null ? ` — ${x.price} ₾` : ""}</option>)}</select></label>
           <label className="adm-field"><span>სპეციალისტი</span><select value={specialistId} onChange={(e) => { setSpecialistId(e.target.value); }} required><option value="">აირჩიეთ</option>{specialists.map((x) => <option key={x._id} value={x._id}>{x.name}{x.title ? ` — ${x.title}` : ""}</option>)}</select></label>
