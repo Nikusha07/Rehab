@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   title: "რეაბილიტაციის ცენტრი საჩხერეში | Reha Sachkhere",
   description: "Reha Sachkhere — სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი საჩხერეში. გაეცანით მომსახურებებს, სპეციალისტებს და დაჯავშნეთ ვიზიტი ონლაინ.",
   icons: {
-    icon: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
-    apple: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
+    icon: [{ url: "/favicon.png", sizes: "96x96", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website", locale: "ka_GE", siteName: "Reha Sachkhere",

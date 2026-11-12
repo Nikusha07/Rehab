@@ -9,8 +9,18 @@ export default function Header() {
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const mobile = window.matchMedia("(max-width: 1100px)");
+    if (!mobile.matches) {
+      setOpen(false);
+      return;
+    }
+
+    const root = document.documentElement;
+    root.classList.add("public-menu-open");
+    const onViewportChange = (event: MediaQueryListEvent) => {
+      if (!event.matches) setOpen(false);
+    };
+    mobile.addEventListener("change", onViewportChange);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
@@ -18,7 +28,8 @@ export default function Header() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      root.classList.remove("public-menu-open");
+      mobile.removeEventListener("change", onViewportChange);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
@@ -39,6 +50,7 @@ export default function Header() {
         </a>
 
         <button
+          type="button"
           className={`menu-button ${open ? "is-open" : ""}`}
           aria-expanded={open}
           aria-controls="main-nav"
@@ -48,7 +60,7 @@ export default function Header() {
           <span></span><span></span><span></span><span className="sr-only">{open ? "მენიუს დახურვა" : "მენიუ"}</span>
         </button>
 
-        {open && <button className="mobile-menu-backdrop" aria-label="მენიუს დახურვა" onClick={close} />}
+        {open && <button type="button" className="mobile-menu-backdrop" tabIndex={-1} aria-label="მენიუს დახურვა" onClick={close} />}
 
         <nav id="main-nav" className={`main-nav ${open ? "is-open" : ""}`}>
           <a href="#services" onClick={close}>სერვისები</a>
