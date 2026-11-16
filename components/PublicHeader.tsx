@@ -18,16 +18,6 @@ export default function PublicHeader() {
     menu.current?.close();
   }
 
-  return () => {
-      document.removeEventListener("pointerdown", dismissOutside);
-      document.removeEventListener("keydown", dismissOnEscape);
-    };
-  }, []);
-
-  function closeMenu() {
-    if (menu.current) menu.current.open = false;
-  }
-
   return (
     <header className={styles.header}>
       <div className={styles.wrap + " " + styles.burgerHeaderRow}>
