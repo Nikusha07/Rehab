@@ -90,6 +90,13 @@ export async function POST(request: NextRequest) {
   } finally { await session.endSession(); }
   await writeAudit({ actor: String(auth.username || "admin"), action: "booking.create", entity: "booking", entityId: String(booking._id), summary: `ხელით შეიქმნა ჯავშანი: ${patientName}, ${date} ${time}`, metadata: { patientPhone, serviceId, specialistId, date, time } });
   const text = `${SITE.name}: თქვენი ვიზიტი დაჯავშნილია ${date}, ${time} საათზე. კოდი: ${code}.`;
-  try { const sms = await sendBookingSms(patientPhone, text); await SmsLog.create({ bookingId: booking._id, phone: patientPhone, message: text, status: sms.success ? "sent" : ("skipped" in sms && sms.skipped ? "skipped" : "failed"), payload: sms }); } catch (error) { console.error("admin booking sms failed", error); }
-  return NextResponse.json({ ok: true, item: booking, confirmationCode: code }, { status: 201 });
+  let smsStatus: "sent" | "skipped" | "failed" = "failed";
+  try {
+    const sms = await sendBookingSms(patientPhone, text);
+    smsStatus = sms.success ? "sent" : ("skipped" in sms && sms.skipped ? "skipped" : "failed");
+    await SmsLog.create({ bookingId: booking._id, phone: patientPhone, message: text, status: smsStatus, payload: sms });
+  } catch (error) {
+    console.error("admin booking sms failed", error);
+  }
+  return NextResponse.json({ ok: true, item: booking, confirmationCode: code, smsStatus }, { status: 201 });
 }
