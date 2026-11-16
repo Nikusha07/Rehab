@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
     if (from || to) filter.date = { ...(from ? { $gte: from } : {}), ...(to ? { $lte: to } : {}) };
     if (status && ["confirmed","completed","cancelled","no_show"].includes(status)) filter.status = status;
     const items = await Booking.find(filter).sort({ date: -1, time: -1 }).limit(from || to ? 1000 : 500)
+      .populate({ path: "patientId", select: "name phone", model: Patient })
       .populate({ path: "serviceId", select: "name durationMinutes price", model: Service })
       .populate({ path: "specialistId", select: "name title", model: Specialist }).lean();
     return NextResponse.json({ ok: true, items });
