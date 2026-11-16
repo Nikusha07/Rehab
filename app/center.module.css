@@ -413,8 +413,7 @@
   gap: 12px;
   min-height: 76px;
 }
-.burgerMenu { position: relative; }
-.burgerToggle {
+.burgerToggle, .burgerClose {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -422,39 +421,55 @@
   gap: 5px;
   width: 46px;
   height: 46px;
-  list-style: none;
+  flex: 0 0 46px;
+  padding: 0;
   border: 1px solid #c5e0d5;
   border-radius: 14px;
   background: #e6f3ee;
   color: #0f3f3b;
   cursor: pointer;
 }
-.burgerToggle::-webkit-details-marker { display: none; }
-.burgerToggle:focus-visible { outline: 2px solid #156b58; outline-offset: 3px; }
-.burgerToggle span {
-  width: 19px;
-  height: 2px;
-  border-radius: 2px;
-  background: currentColor;
-  transition: transform .18s ease, opacity .18s ease;
-}
-.burgerMenu[open] .burgerToggle span:first-child { transform: translateY(7px) rotate(45deg); }
-.burgerMenu[open] .burgerToggle span:nth-child(2) { opacity: 0; }
-.burgerMenu[open] .burgerToggle span:last-child { transform: translateY(-7px) rotate(-45deg); }
-.burgerPanel {
-  position: absolute;
-  top: calc(100% + 9px);
-  right: 0;
-  display: grid;
-  gap: 3px;
-  width: min(290px, calc(100vw - 32px));
-  max-height: calc(100dvh - 79px);
+.burgerToggle:focus-visible, .burgerClose:focus-visible { outline: 2px solid #156b58; outline-offset: 3px; }
+.burgerToggle span { width: 19px; height: 2px; border-radius: 2px; background: currentColor; }
+.burgerClose { font: inherit; font-size: 25px; line-height: 1; }
+.burgerDialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(410px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
   overflow: auto;
-  padding: 7px;
+  overscroll-behavior: contain;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 22px;
   background: var(--white);
-  box-shadow: 0 14px 35px rgb(15 63 59 / 18%);
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgb(15 63 59 / 32%);
+}
+.burgerDialog::backdrop {
+  background: rgb(11 49 47 / 58%);
+  backdrop-filter: blur(8px);
+}
+:global(body):has(.burgerDialog[open]) { overflow: hidden; }
+.burgerCard { padding: clamp(13px, 4vw, 22px); }
+.burgerCardHead {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
+}
+.site .burgerCardHead h2 { font-size: 24px; }
+.burgerPanel { display: grid; gap: 4px; }
+@media (prefers-reduced-motion: no-preference) {
+  .burgerDialog[open] { animation: menu-appear .26s cubic-bezier(.2,.7,.2,1) both; }
+  .burgerDialog[open]::backdrop { animation: menu-backdrop .24s ease-out both; }
+}
+@keyframes menu-appear {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes menu-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .burgerPanel a {
   display: flex;
@@ -489,4 +504,4 @@
 @media (min-width: 621px) and (max-width: 760px) {
   .footerNav { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); }
 }
-@media (prefers-reduced-motion: reduce) { .burgerToggle span { transition: none; } }
+

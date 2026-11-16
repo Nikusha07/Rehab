@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import styles from "@/app/center.module.css";
 
 const links = [
@@ -12,36 +12,10 @@ const links = [
 ] as const;
 
 export default function PublicHeader() {
-  const menu = useRef<HTMLDetailsElement>(null);
-  const toggle = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const details = menu.current;
-    if (!details) return;
-
-    function dismissOutside(event: PointerEvent) {
-      if (details?.open && event.target instanceof Node && !details.contains(event.target)) {
-        details.open = false;
-      }
-    }
-
-    function dismissOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape" && details?.open) {
-        details.open = false;
-        toggle.current?.focus();
-      }
-    }
-
-    document.addEventListener("pointerdown", dismissOutside, { passive: true });
-    document.addEventListener("keydown", dismissOnEscape);
-    return () => {
-      document.removeEventListener("pointerdown", dismissOutside);
-      document.removeEventListener("keydown", dismissOnEscape);
-    };
-  }, []);
+  const menu = useRef<HTMLDialogElement>(null);
 
   function closeMenu() {
-    if (menu.current) menu.current.open = false;
+    menu.current?.close();
   }
 
   return (
@@ -51,17 +25,24 @@ export default function PublicHeader() {
           <Image src="/logo-symbol.png" alt="" width={44} height={44} />
           <span><strong>Reha Sachkhere</strong><small>რეაბილიტაციის ცენტრი</small></span>
         </a>
-        <details className={styles.burgerMenu} ref={menu}>
-          <summary className={styles.burgerToggle} ref={toggle} aria-label="მთავარი მენიუ">
-            <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
-          </summary>
-          <nav className={styles.burgerPanel} aria-label="მთავარი ნავიგაცია">
-            {links.map(([href, label]) => (
-              <a key={href} href={href} onClick={closeMenu}>{label}<span aria-hidden="true">↗</span></a>
-            ))}
-            <a className={styles.menuBooking} href="#booking" onClick={closeMenu}>ვიზიტზე ჩაწერა <span aria-hidden="true">↗</span></a>
-          </nav>
-        </details>
+        <button type="button" className={styles.burgerToggle} aria-label="მთავარი მენიუს გახსნა" aria-haspopup="dialog" onClick={() => menu.current?.showModal()}>
+          <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
+        </button>
+        <dialog className={styles.burgerDialog} ref={menu} aria-labelledby="public-menu-title"
+          onClick={(event) => { if (event.target === event.currentTarget) closeMenu(); }}>
+          <div className={styles.burgerCard}>
+            <div className={styles.burgerCardHead}>
+              <h2 id="public-menu-title">მენიუ</h2>
+              <button type="button" className={styles.burgerClose} aria-label="მენიუს დახურვა" onClick={closeMenu}>×</button>
+            </div>
+            <nav className={styles.burgerPanel} aria-label="მთავარი ნავიგაცია">
+              {links.map(([href, label]) => (
+                <a key={href} href={href} onClick={closeMenu}>{label}<span aria-hidden="true">↗</span></a>
+              ))}
+              <a className={styles.menuBooking} href="#booking" onClick={closeMenu}>ვიზიტზე ჩაწერა <span aria-hidden="true">↗</span></a>
+            </nav>
+          </div>
+        </dialog>
       </div>
     </header>
   );
