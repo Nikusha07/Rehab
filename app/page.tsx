@@ -165,7 +165,7 @@ export default async function HomePage() {
       <section className={styles.booking} id="booking">
         <div className={styles.wrap + " " + styles.bookingGrid}>
           <div><p className={styles.kicker}>ონლაინ ჩაწერა</p><h2>დაგეგმეთ<br />თქვენი ვიზიტი</h2><p>აირჩიეთ მომსახურება, სპეციალისტი და თავისუფალი დრო. ჩაწერას ტელეფონზე მიღებული კოდით დაადასტურებთ.</p><a href={phone}>ტელეფონით ჩაწერა · {phoneDisplay} ↗</a></div>
-          {preview ? <div className={styles.demo}><h3>აირჩიეთ მომსახურება</h3><p>ფორმის წინასწარი ნახვა</p><div>{services.map((item) => <label key={item.icon}><input type="radio" name="preview-service" /> {item.title}</label>)}</div><small>საცდელ ვერსიაში ჯავშანი არ იქმნება.</small></div> : <div className={styles.wizard}><BookingWizard /></div>}
+          <div className={styles.wizard}><BookingWizard preview={preview} /></div>
         </div>
       </section>
 
