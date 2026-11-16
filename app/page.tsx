@@ -83,7 +83,7 @@ export default async function HomePage() {
             <span><strong>Reha Sachkhere</strong><small>რეაბილიტაციის ცენტრი</small></span>
           </a>
           <nav aria-label="მთავარი მენიუ" className={styles.nav}>
-            <a href="#services">მომსახურება</a><a href="#about">ცენტრის შესახებ</a><a href="#contact">კონტაქტი</a>
+            <a href="#services">მომსახურება</a><a href="#about">ცენტრის შესახებ</a><a href="#contact">ლოკაცია</a>
           </nav>
           <a className={styles.headerAction} href="#booking">ჩაწერა <span aria-hidden="true">↗</span></a>
         </div>
@@ -171,17 +171,33 @@ export default async function HomePage() {
 
       <section className={styles.section} id="contact">
         <div className={styles.wrap + " " + styles.location}>
-          <div><p className={styles.kicker}>მისამართი და კონტაქტი</p><h2>გელოდებით<br />საჩხერეში</h2><p>{site.address}<br />{hours}</p>
-            <div className={styles.actions}><a className={styles.primary} href={maps} target="_blank" rel="noreferrer">მარშრუტი ↗</a><a className={styles.textLink} href={phone}>{phoneDisplay}</a></div>
+          <div>
+            <p className={styles.kicker}>ლოკაცია</p>
+            <h2>გელოდებით<br />საჩხერეში</h2>
+            <p className={styles.addressDetail}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><path d="M20 10c0 5-8 10-8 10s-8-5-8-10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></></svg><span>{site.address}<br />{hours}</span></p>
+            <div className={styles.actions}>
+              <a className={styles.primary} href={maps} target="_blank" rel="noreferrer" aria-label="ლოკაცია და მარშრუტი რუკაზე"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="m21 3-6.5 18-3.7-7.8L3 9.5 21 3Z"/></svg> ლოკაცია</a>
+              <a className={styles.locationPhone} href={phone}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2 16 16 0 0 0 16 16 2 2 0 0 0 2-2v-3l-5-2-2 2a12 12 0 0 1-6-6l2-2-2-5Z"/></svg> {phoneDisplay}</a>
+            </div>
           </div>
-          <a className={styles.entrance} href={maps} target="_blank" rel="noreferrer" aria-label="ცენტრის მდებარეობა რუკაზე"><Image src="/center/rehab1.jpg" alt="რეაბილიტაციის ცენტრის შესასვლელი" fill sizes="(max-width: 760px) 100vw, 50vw" /></a>
+          <a className={styles.entrance} href={maps} target="_blank" rel="noreferrer" aria-label="ცენტრის მდებარეობა რუკაზე">
+            <Image src="/center/rehab1.jpg" alt="რეაბილიტაციის ცენტრის შესასვლელი" fill sizes="(max-width: 760px) 100vw, 50vw" />
+          </a>
         </div>
       </section>
       <footer className={styles.footer}>
         <div className={styles.wrap + " " + styles.footerRow}>
-          <a className={styles.brand} href="#top"><Image src="/logo-symbol.png" alt="" width={38} height={38} /><strong>Reha Sachkhere</strong></a>
-          <div>{site.facebook && <a href={site.facebook} target="_blank" rel="noreferrer">Facebook ↗</a>}{site.instagram && <a href={site.instagram} target="_blank" rel="noreferrer">Instagram ↗</a>}{whatsappHref && <a href={whatsappHref} target="_blank" rel="noreferrer">WhatsApp ↗</a>}</div>
-          <a href="/admin/login">ადმინისტრაცია</a>
+          <a className={styles.brand} href="#top">
+            <Image src="/logo-symbol.png" alt="" width={38} height={38} />
+            <span><strong>Reha Sachkhere</strong><small>რეაბილიტაციის ცენტრი</small></span>
+          </a>
+          <nav className={styles.footerNav} aria-label="დამატებითი ბმულები">
+            <a href="#contact"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><path d="M20 10c0 5-8 10-8 10s-8-5-8-10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></></svg> ლოკაცია</a>
+            {site.facebook && <a href={site.facebook} target="_blank" rel="noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path fill="currentColor" stroke="none" d="M14 21v-8h2.7l.4-3H14V8.1c0-.9.3-1.5 1.6-1.5h1.7V4a20 20 0 0 0-2.5-.2c-2.5 0-4.2 1.5-4.2 4.3V10H8v3h2.6v8H14Z"/></svg> Facebook</a>}
+            {site.instagram && <a href={site.instagram} target="_blank" rel="noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></></svg> Instagram</a>}
+            {whatsappHref && <a href={whatsappHref} target="_blank" rel="noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M20 11.5a8 8 0 0 1-8 8 8.2 8.2 0 0 1-3.5-.8L4 20l1.3-4.1A8 8 0 1 1 20 11.5Z"/></svg> WhatsApp</a>}
+            <a href="/admin/login"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></></svg> ადმინისტრაცია</a>
+          </nav>
         </div>
       </footer>
     </main>

@@ -373,3 +373,35 @@
   .site .headerAction { grid-column: 2; grid-row: 1; }
   .site section[id] { scroll-margin-top: 133px; }
 }
+
+.location {
+  background: linear-gradient(145deg, #e6f3ee, #f4faf7);
+  border-color: #cfe2d9;
+}
+.location svg, .footerNav svg { width: 19px; height: 19px; flex: 0 0 19px; }
+.location .addressDetail, .locationPhone { display: flex; align-items: center; gap: 9px; }
+.location .addressDetail svg { align-self: flex-start; margin-top: 4px; color: #156b58; }
+.locationPhone { min-height: 44px; padding: 0 9px; font-weight: 750; }
+.locationPhone:hover { text-decoration: underline; text-underline-offset: 4px; }
+.footer {
+  background: linear-gradient(125deg, #0f3f3b, #0b312f);
+  color: #f4fbf8;
+  border-top: 1px solid #1f6357;
+}
+.footer .brand { min-height: 48px; }
+.footer .brand img { padding: 4px; background: #e6f3ee; border-radius: 10px; }
+.footer .brand small { color: #bce4d6; }
+.footerRow { gap: 13px 20px; padding-block: 24px; }
+.footerNav { display: flex; flex-wrap: wrap; gap: 7px; }
+.footerNav a {
+  display: inline-flex; gap: 7px; align-items: center;
+  min-height: 44px; padding: 7px 11px; border: 1px solid #4c8075; border-radius: 11px;
+  background: rgb(255 255 255 / 6%); transition: background-color .2s ease;
+}
+.footerNav svg { color: #bce4d6; }
+.footerNav a:hover { background: rgb(255 255 255 / 14%); text-decoration: none; }
+@media (max-width: 620px) {
+  .footerRow { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .footerNav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .footerNav a { transition: none; } }
