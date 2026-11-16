@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import BookingWizard from "@/components/BookingWizard";
-import Header from "@/components/Header";
+import styles from "./center.module.css";
 import { getSiteConfig } from "@/lib/site";
 import { dbConnect } from "@/lib/db";
 import Service from "@/models/Service";
@@ -15,18 +15,17 @@ const fallbackServices = [
   { icon: "01", title: "სარეაბილიტაციო კონსულტაცია", text: "მდგომარეობის შეფასება, ინდივიდუალური მიზნების განსაზღვრა და პერსონალური სარეაბილიტაციო გეგმა." },
   { icon: "02", title: "სამკურნალო ფიზკულტურა", text: "ფუნქციური მოძრაობის, ძალის, ბალანსისა და ყოველდღიური აქტივობის გაუმჯობესებაზე ორიენტირებული ვარჯიში." },
   { icon: "03", title: "ფიზიკური რეაბილიტაცია", text: "ტრავმის, ოპერაციის ან ხანგრძლივი უმოძრაობის შემდეგ უსაფრთხო და ეტაპობრივი აღდგენის პროგრამა." },
-  { icon: "04", title: "მობილობის აღდგენა", text: "სახსრების მოძრაობის დიაპაზონის, კოორდინაციისა და დამოუკიდებელი გადაადგილების გაუმჯობესება." },
-  { icon: "05", title: "ტკივილის მართვა", text: "ტკივილის შემცირებისკენ მიმართული ინდივიდუალური თერაპიული მიდგომები და მოძრაობის კორექცია." },
-  { icon: "06", title: "ინდივიდუალური პროგრამა", text: "პაციენტის საჭიროებებზე, ასაკსა და ფუნქციურ მდგომარეობაზე მორგებული რეაბილიტაციის პროცესი." },
 ];
 
 export default async function HomePage() {
   const site = await getSiteConfig();
+  const preview = process.env.VERCEL_ENV === "preview";
   let services = fallbackServices;
   let specialists: any[] = [];
 
   try {
-    await dbConnect();
+    if (!preview || process.env.MONGODB_URI) await dbConnect();
+    else throw new Error("Preview database is not configured");
     const [serviceDocs, specialistDocs] = await Promise.all([
       Service.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean(),
       Specialist.find({ isActive: true, showOnWebsite: true }).sort({ sortOrder: 1, name: 1 }).lean(),
@@ -48,7 +47,7 @@ export default async function HomePage() {
     "@context": "https://schema.org",
     "@graph": [
       { "@type": "WebSite", "@id": origin + "/#website", url: origin + "/", name: "Reha Sachkhere", alternateName: ["რეაბილიტაციის ცენტრი საჩხერეში", "rehasackhere"], inLanguage: "ka", publisher: { "@id": origin + "/#center" } },
-      { "@type": "MedicalClinic", "@id": origin + "/#center", name: site.centerName, alternateName: ["Reha Sachkhere", "rehasackhere"], url: origin + "/", logo: { "@type": "ImageObject", url: origin + "/icon.png", width: 512, height: 512 }, image: origin + "/rehab-hero.jpg", description: "სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი საჩხერეში. ონლაინ ჩაწერა ვიზიტზე.", telephone: site.phone.startsWith("+") ? site.phone : "+995" + site.phone, address: { "@type": "PostalAddress", addressLocality: "საჩხერე", addressCountry: "GE", streetAddress: site.address }, sameAs: [site.facebook, site.instagram].filter(value => /^https?:\/\//.test(value)) },
+      { "@type": "MedicalClinic", "@id": origin + "/#center", name: site.centerName, alternateName: ["Reha Sachkhere", "rehasackhere"], url: origin + "/", logo: { "@type": "ImageObject", url: origin + "/icon.png", width: 512, height: 512 }, image: origin + "/center/rehab8.jpg", description: "სამკურნალო ფიზკულტურისა და რეაბილიტაციის ცენტრი საჩხერეში. ონლაინ ჩაწერა ვიზიტზე.", telephone: site.phone.startsWith("+") ? site.phone : "+995" + site.phone, address: { "@type": "PostalAddress", addressLocality: "საჩხერე", addressCountry: "GE", streetAddress: site.address }, sameAs: [site.facebook, site.instagram].filter(value => /^https?:\/\//.test(value)) },
     ],
   };
 
@@ -60,268 +59,131 @@ export default async function HomePage() {
       : `https://wa.me/${site.whatsapp.replace(/\D/g, "")}`
     : "";
 
+
+  const photos = [
+    [3, "მოსაცდელი"],
+    [4, "თერაპიის კაბინეტი"],
+    [6, "სავარჯიშო დარბაზი"],
+    [2, "მისაღები"],
+    [5, "პროცედურების კაბინეტი"],
+    [7, "ბალანსისა და მოძრაობის სივრცე"],
+    [8, "სამკურნალო ვარჯიშის სივრცე"],
+  ] as const;
+  const maps = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+  const hours = site.hours;
+  const phone = `tel:${site.phone}`;
+
   return (
-    <main id="top" className="public-site">
-      <Header />
+    <main id="top" className={styles.site}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
+      <header className={styles.header}>
+        <div className={styles.wrap + " " + styles.headerRow}>
+          <a className={styles.brand} href="#top">
+            <Image src="/logo-symbol.png" alt="" width={44} height={44} />
+            <span><strong>Reha Sachkhere</strong><small>რეაბილიტაციის ცენტრი</small></span>
+          </a>
+          <nav aria-label="მთავარი მენიუ" className={styles.nav}>
+            <a href="#services">მომსახურება</a><a href="#about">ცენტრის შესახებ</a><a href="#contact">კონტაქტი</a>
+          </nav>
+          <a className={styles.headerAction} href="#booking">ჩაწერა <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
 
-      <section className="hero-section">
-        <div className="hero-glow one" />
-        <div className="hero-glow two" />
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <span className="eyebrow"><i /> Reha Sachkhere · რეაბილიტაციის ცენტრი საჩხერეში</span>
-            <h1>რეაბილიტაცია საჩხერეში — <span>აღდგენა სწორი მოძრაობით.</span></h1>
-            <p>Reha Sachkhere (rehasackhere.ge) — {site.tagline} საჩხერეში. ინდივიდუალური მიდგომა, პროფესიული გუნდი და მარტივი ონლაინ ჩაწერა ერთ სივრცეში.</p>
-
-            <div className="hero-actions">
-              <a className="button button-primary" href="#booking">ვიზიტზე ჩაწერა <span>→</span></a>
-              <a className="button button-ghost" href="#services">სერვისების ნახვა</a>
-            </div>
-
-            <div className="trust-row" aria-label="ცენტრის უპირატესობები">
-              <div><b>ინდივიდუალური</b><small>მკურნალობის გეგმა</small></div>
-              <div><b>მარტივი</b><small>ონლაინ ჩაწერა</small></div>
-              <div><b>უსაფრთხო</b><small>დროის რეალური შემოწმება</small></div>
+      <section className={styles.hero}>
+        <div className={styles.wrap + " " + styles.heroGrid}>
+          <div className={styles.heroCopy}>
+            <p className={styles.kicker}>საჩხერე, საქართველო</p>
+            <h1>მოძრაობის<br />აღდგენა<br /><em>იწყება აქ.</em></h1>
+            <p className={styles.lede}>სამკურნალო ფიზკულტურა და ფიზიკური რეაბილიტაცია. პირველ ვიზიტზე შევაფასებთ თქვენს მდგომარეობას და ერთად დავგეგმავთ შემდეგ ნაბიჯებს.</p>
+            <div className={styles.actions}>
+              <a className={styles.primary} href="#booking">ვიზიტზე ჩაწერა <span aria-hidden="true">↗</span></a>
+              <a className={styles.textLink} href="#services">მომსახურება <span aria-hidden="true">↓</span></a>
             </div>
           </div>
-
-          <div className="hero-visual">
-            <div className="hero-photo">
-              <Image
-                src="/rehab-hero.jpg"
-                alt="ფიზიკური რეაბილიტაცია"
-                fill
-                sizes="(max-width: 1100px) 100vw, 48vw"
-                quality={92}
-                priority
-              />
-            </div>
-            <div className="hero-badge badge-top">
-              <span className="badge-icon">✓</span>
-              <div><b>ონლაინ ჩაწერა</b><small>აირჩიეთ თავისუფალი დრო</small></div>
-            </div>
-            <div className="hero-badge badge-bottom">
-              <span className="pulse-dot" />
-              <div><b>გრაფიკი რეალურ დროში</b><small>დაკავებული დრო ავტომატურად იბლოკება</small></div>
-            </div>
-          </div>
+          <figure className={styles.heroPhoto}>
+            <Image src="/center/rehab8.jpg" alt="ცენტრის სავარჯიშო სივრცე, სამკურნალო ბურთები და აღჭურვილობა" fill sizes="(max-width: 760px) 100vw, 55vw" preload />
+            <figcaption><span>Reha Sachkhere</span><a href="#gallery">დაათვალიერეთ სივრცე ↘</a></figcaption>
+          </figure>
         </div>
       </section>
 
-      <section className="quick-strip">
-        <div className="container quick-grid">
-          <div><span>⌖</span><p><small>მისამართი</small><b>{site.address}</b></p></div>
-          <div><span>◷</span><p><small>სამუშაო საათები</small><b>{site.hours}</b></p></div>
-          <div><span>☎</span><p><small>დაგვიკავშირდით</small><b>{phoneDisplay}</b></p></div>
+      <div className={styles.contactBar}>
+        <div className={styles.wrap + " " + styles.barGrid}>
+          <a href={maps} target="_blank" rel="noreferrer"><small>მისამართი</small><strong>{site.address} ↗</strong></a>
+          <div><small>სამუშაო საათები</small><strong>{hours}</strong></div>
+          <a href={phone}><small>დაგვირეკეთ</small><strong>{phoneDisplay} ↗</strong></a>
         </div>
-      </section>
+      </div>
 
-      <section className="section" id="services">
-        <div className="container">
-          <div className="section-heading split-heading">
-            <div>
-              <span className="eyebrow green">ჩვენი მიმართულებები</span>
-              <h2>რეაბილიტაცია, რომელიც თქვენს მიზნებს ერგება</h2>
-            </div>
-            <p>მკურნალობის გეგმა იქმნება ინდივიდუალურად — შეფასებიდან ყოველდღიურ აქტივობაში უსაფრთხო დაბრუნებამდე.</p>
-          </div>
-
-          <div className="service-grid">
+      <section className={styles.section} id="services">
+        <div className={styles.wrap}>
+          <div className={styles.sectionHead}><div><p className={styles.kicker}>მომსახურება</p><h2>რით შეგვიძლია<br />დაგეხმაროთ</h2></div><p>თუ არ იცით, რომელი მომსახურებით დაიწყოთ, ჩაიწერეთ პირველად კონსულტაციაზე.</p></div>
+          <div className={styles.serviceGrid}>
             {services.map((item) => (
-              <article className="service-card" key={item.icon}>
-                <span className="service-index">{item.icon}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-                <a href="#booking">ჩაწერა <span>↗</span></a>
+              <article className={styles.service} key={item.icon}>
+                <h3>{item.title}</h3><p>{item.text}</p>
+                <a href="#booking" aria-label={item.title + " — ვიზიტზე ჩაწერა"}>ჩაწერა <span aria-hidden="true">↗</span></a>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section soft-section" id="about">
-        <div className="container about-grid">
-          <div className="about-visual">
-            <div className="about-photo main">
-              <Image
-                src="/therapy.jpg"
-                alt="რეაბილიტაციის პროცესი"
-                fill
-                sizes="(max-width: 1100px) 100vw, 50vw"
-                quality={92}
-              />
-            </div>
-            <div className="about-stamp"><b>ზრუნვა</b><span>•</span><small>მოძრაობა • პროგრესი</small></div>
-          </div>
-
-          <div className="about-copy">
-            <span className="eyebrow green">ჩვენ შესახებ</span>
-            <h2>ფოკუსი არა მხოლოდ სიმპტომზე — არამედ ფუნქციის დაბრუნებაზე</h2>
-            <p>ჩვენი მიზანია რეაბილიტაციის პროცესი იყოს გასაგები, თანმიმდევრული და რეალურ ყოველდღიურ შედეგზე ორიენტირებული. თითოეული პაციენტის გეგმა ეფუძნება მის მდგომარეობას, შესაძლებლობებსა და მიზნებს.</p>
-            <ul className="check-list">
-              <li><span>✓</span> ინდივიდუალური შეფასება და გეგმა</li>
-              <li><span>✓</span> პროგრესის ეტაპობრივი კონტროლი</li>
-              <li><span>✓</span> უსაფრთხო და ადაპტირებული დატვირთვა</li>
-              <li><span>✓</span> მარტივი ვიზიტების მართვა</li>
-            </ul>
-            <a className="text-link" href="#booking">აირჩიეთ თქვენთვის მოსახერხებელი დრო <span>→</span></a>
+      <section className={styles.about} id="about">
+        <div className={styles.wrap + " " + styles.aboutGrid}>
+          <div className={styles.aboutPhoto}><Image src="/center/rehab4.jpg" alt="თერაპიის კაბინეტი ცენტრში" fill sizes="(max-width: 760px) 100vw, 50vw" /></div>
+          <div className={styles.aboutCopy}><p className={styles.kicker}>პირველი ვიზიტი</p><h2>რისგან იწყება რეაბილიტაცია?</h2>
+            <p>სპეციალისტს გაესაუბრებით იმაზე, რა გიჭირთ ყოველდღიურ მოძრაობაში და რისი აღდგენა გსურთ. შეფასების შემდეგ ერთად შეარჩევთ თქვენზე მორგებულ ვარჯიშებსა და დატვირთვას.</p>
+            <a className={styles.textLink} href="#booking">დაგეგმეთ პირველი ვიზიტი ↗</a>
           </div>
         </div>
       </section>
 
-      {specialists.length > 0 && (
-        <section className="section team-section" id="team">
-          <div className="container">
-            <div className="section-heading centered">
-              <span className="eyebrow green">ჩვენი გუნდი</span>
-              <h2>სპეციალისტები, რომლებიც თქვენს პროგრესზე ზრუნავენ</h2>
-              <p>გაიცანით ჩვენი გუნდი და ონლაინ ჩაწერისას აირჩიეთ სასურველი სპეციალისტი.</p>
-            </div>
+      {specialists.length > 0 && <section className={styles.section} id="team">
+        <div className={styles.wrap}>
+          <p className={styles.kicker}>ჩვენი გუნდი</p><h2>გაიცანით სპეციალისტები</h2>
+          <div className={styles.teamGrid}>{specialists.map((person) => (
+            <article className={styles.person} key={String(person._id)}>
+              {person.image ? <img src={person.image} alt={person.name} loading="lazy" /> : <Image src="/logo-symbol.png" alt="" width={76} height={76} />}
+              <div><h3>{person.name}</h3><p>{person.title || "რეაბილიტაციის სპეციალისტი"}</p>{person.bio && <p>{person.bio}</p>}</div>
+            </article>
+          ))}</div>
+        </div>
+      </section>}
 
-            <div className="team-grid">
-              {specialists.map((x: any) => (
-                <article className="team-card" key={String(x._id)}>
-                  <div className="team-photo">
-                    {x.image ? <img src={x.image} alt={x.name} /> : <Image src="/logo-symbol.png" alt="" width={88} height={96} />}
-                  </div>
-                  <div className="team-copy">
-                    <span>სპეციალისტი</span>
-                    <h3>{x.name}</h3>
-                    <b>{x.title || "რეაბილიტაციის სპეციალისტი"}</b>
-                    {x.bio && <p>{x.bio}</p>}
-                    <a href="#booking">ვიზიტზე ჩაწერა →</a>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <section className="section gallery-section" id="gallery">
-        <div className="container">
-          <div className="section-heading split-heading">
-            <div>
-              <span className="eyebrow green">ჩვენი სივრცე</span>
-              <h2>გარემო, რომელიც აღდგენაზეა მორგებული</h2>
-            </div>
-            <p>სუფთა, მშვიდი და ფუნქციური სივრცე, სადაც თერაპიის თითოეული ეტაპი კომფორტსა და უსაფრთხოებაზეა ორიენტირებული.</p>
-          </div>
-
-          <div className="gallery-grid gallery-story">
-            <div className="gallery-tile gallery-feature">
-              <Image
-                src="/therapy.jpg"
-                alt="ინდივიდუალური თერაპიის პროცესი"
-                fill
-                sizes="(max-width: 720px) 100vw, 60vw"
-                quality={94}
-              />
-              <span className="gallery-caption">ინდივიდუალური თერაპია</span>
-            </div>
-
-            <div className="gallery-tile gallery-secondary">
-              <Image
-                src="/rehab-hero.jpg"
-                alt="მობილობის აღდგენის პროცესი"
-                fill
-                sizes="(max-width: 720px) 100vw, 40vw"
-                quality={94}
-              />
-              <span className="gallery-caption">მოძრაობა და პროგრესი</span>
-            </div>
-
-            <div className="gallery-info-card">
-              <span className="gallery-info-icon">✓</span>
-              <div>
-                <small>ჩვენი მიდგომა</small>
-                <h3>მშვიდი გარემო, მკაფიო გეგმა და ყურადღება თითოეულ დეტალზე.</h3>
-                <a href="#booking">ვიზიტის დაგეგმვა <span>→</span></a>
-              </div>
-            </div>
-          </div>
+      <section className={styles.section + " " + styles.gallerySection} id="gallery">
+        <div className={styles.wrap}>
+          <div className={styles.sectionHead}><div><p className={styles.kicker}>ცენტრის ფოტოები</p><h2>გაიცანით ჩვენი სივრცე</h2></div><p>მისაღები, თერაპიის კაბინეტები და სამკურნალო ვარჯიშის დარბაზი.</p></div>
+          <div className={styles.gallery}>{photos.map(([id, caption]) => (
+            <figure key={id}><a className={styles.galleryImage} href={`/center/rehab${id}.jpg`} target="_blank" rel="noreferrer" aria-label={caption + " — სრული ფოტო"}>
+              <Image src={`/center/rehab${id}.jpg`} alt={caption} fill sizes="(max-width: 480px) 50vw, (max-width: 760px) 45vw, 28vw" />
+            </a><figcaption>{caption}</figcaption></figure>
+          ))}</div>
         </div>
       </section>
 
-      <section className="section process-section">
-        <div className="container">
-          <div className="section-heading centered">
-            <span className="eyebrow green">როგორ მუშაობს</span>
-            <h2>ჩაწერა რამდენიმე მარტივ ნაბიჯში</h2>
-            <p>აღარ არის საჭირო თავისუფალი დროის ტელეფონით დაზუსტება — სისტემა გაჩვენებთ მხოლოდ რეალურად ხელმისაწვდომ სლოტებს.</p>
-          </div>
-
-          <div className="process-grid">
-            <div className="process-card"><span>1</span><h3>აირჩიეთ სერვისი</h3><p>მიუთითეთ სასურველი მომსახურება და სპეციალისტი.</p></div>
-            <div className="process-card"><span>2</span><h3>ნახეთ თავისუფალი დრო</h3><p>აირჩიეთ თარიღი და სისტემა ავტომატურად გაჩვენებთ თავისუფალ საათებს.</p></div>
-            <div className="process-card"><span>3</span><h3>დაადასტურეთ ვიზიტი</h3><p>შეავსეთ სახელი და ტელეფონი — მიიღებთ დადასტურების კოდს.</p></div>
-          </div>
+      <section className={styles.booking} id="booking">
+        <div className={styles.wrap + " " + styles.bookingGrid}>
+          <div><p className={styles.kicker}>ონლაინ ჩაწერა</p><h2>დაგეგმეთ<br />თქვენი ვიზიტი</h2><p>აირჩიეთ მომსახურება, სპეციალისტი და თავისუფალი დრო. ჩაწერას ტელეფონზე მიღებული კოდით დაადასტურებთ.</p><a href={phone}>ტელეფონით ჩაწერა · {phoneDisplay} ↗</a></div>
+          <div className={styles.wizard}><BookingWizard preview={preview} /></div>
         </div>
       </section>
 
-      <section className="booking-section" id="booking">
-        <div className="container booking-layout">
-          <div className="booking-intro">
-            <span className="eyebrow light">ონლაინ ჩაწერა</span>
-            <h2>დაჯავშნეთ ვიზიტი თქვენთვის მოსახერხებელ დროს</h2>
-            <p>აირჩიეთ მომსახურება, სპეციალისტი და თარიღი. სისტემა რეალურ დროში ამოწმებს თავისუფალ დროს და თავიდან გვარიდებს ორმაგ ჯავშანს.</p>
-            <div className="booking-points">
-              <div><span>01</span><p><b>მხოლოდ თავისუფალი დროები</b><small>დაკავებული სლოტები ავტომატურად იბლოკება.</small></p></div>
-              <div><span>02</span><p><b>დადასტურების კოდი</b><small>წარმატებული ჩაწერის შემდეგ მიიღებთ უნიკალურ კოდს.</small></p></div>
-              <div><span>03</span><p><b>SMS ინტეგრაციისთვის მზადაა</b><small>GoSMS-ის გააქტიურების შემდეგ შეტყობინება ავტომატურად გაიგზავნება.</small></p></div>
-            </div>
+      <section className={styles.section} id="contact">
+        <div className={styles.wrap + " " + styles.location}>
+          <div><p className={styles.kicker}>მისამართი და კონტაქტი</p><h2>გელოდებით<br />საჩხერეში</h2><p>{site.address}<br />{hours}</p>
+            <div className={styles.actions}><a className={styles.primary} href={maps} target="_blank" rel="noreferrer">მარშრუტი ↗</a><a className={styles.textLink} href={phone}>{phoneDisplay}</a></div>
           </div>
-          <div className="booking-shell"><BookingWizard /></div>
+          <a className={styles.entrance} href={maps} target="_blank" rel="noreferrer" aria-label="ცენტრის მდებარეობა რუკაზე"><Image src="/center/rehab1.jpg" alt="რეაბილიტაციის ცენტრის შესასვლელი" fill sizes="(max-width: 760px) 100vw, 50vw" /></a>
         </div>
       </section>
-
-      <section className="section" id="contact">
-        <div className="container contact-card">
-          <div>
-            <span className="eyebrow green">კონტაქტი</span>
-            <h2>კითხვა გაქვთ ვიზიტამდე?</h2>
-            <p>დაგვიკავშირდით სამუშაო საათებში ან გამოიყენეთ ონლაინ ჩაწერის ფორმა.</p>
-          </div>
-          <div className="contact-actions">
-            <a className="contact-pill" href={`tel:${site.phone}`}><small>ტელეფონი</small><b>{phoneDisplay}</b></a>
-            <div className="contact-pill"><small>მისამართი</small><b>{site.address}</b></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="map-section" aria-labelledby="location-title">
-        <div className="container map-layout">
-          <div className="map-copy">
-            <span className="eyebrow green">ლოკაცია</span>
-            <h2 id="location-title">მარტივად მოგვაგენით</h2>
-            <p>რუკაზე ნაჩვენებია ცენტრის ზუსტი ლოკაცია. მარშრუტის გასახსნელად დააჭირეთ ღილაკს.</p>
-            <div className="map-address-card"><span className="map-pin" aria-hidden="true">⌖</span><div><small>მისამართი</small><strong>{site.address}</strong></div></div>
-            <a className="button button-primary map-route-button" href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`} target="_blank" rel="noreferrer">მარშრუტის გახსნა <span>↗</span></a>
-          </div>
-          <div className="map-frame-wrap">
-            <iframe title="რეაბილიტაციის ცენტრი — რუკა" src={`https://www.google.com/maps?q=${mapQuery}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-          </div>
-        </div>
-      </section>
-
-      <footer className="footer">
-        <div className="container footer-inner">
-          <div className="footer-brand">
-            <Image src="/logo.svg?v=20261007-final" alt="Rehab Center" width={200} height={60} />
-            <p><b>{site.centerName}</b><small>{site.tagline}</small></p>
-          </div>
-          <div className="footer-socials">
-            {site.facebook && <a href={site.facebook} target="_blank" rel="noreferrer">Facebook</a>}
-            {site.instagram && <a href={site.instagram} target="_blank" rel="noreferrer">Instagram</a>}
-            {whatsappHref && <a href={whatsappHref} target="_blank" rel="noreferrer">WhatsApp</a>}
-          </div>
-          <span>© {new Date().getFullYear()} ყველა უფლება დაცულია.</span>
+      <footer className={styles.footer}>
+        <div className={styles.wrap + " " + styles.footerRow}>
+          <a className={styles.brand} href="#top"><Image src="/logo-symbol.png" alt="" width={38} height={38} /><strong>Reha Sachkhere</strong></a>
+          <div>{site.facebook && <a href={site.facebook} target="_blank" rel="noreferrer">Facebook ↗</a>}{site.instagram && <a href={site.instagram} target="_blank" rel="noreferrer">Instagram ↗</a>}{whatsappHref && <a href={whatsappHref} target="_blank" rel="noreferrer">WhatsApp ↗</a>}</div>
           <a href="/admin/login">ადმინისტრაცია</a>
         </div>
       </footer>
-
-      <a className="mobile-booking-cta" href="#booking">ვიზიტზე ჩაწერა <span>→</span></a>
     </main>
   );
 }

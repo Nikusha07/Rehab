@@ -20,9 +20,16 @@ function formatCountdown(total: number) {
   return `${minutes}:${seconds}`;
 }
 
-export default function BookingWizard() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [specialists, setSpecialists] = useState<Specialist[]>([]);
+const previewServices: Service[] = [
+  { _id: "consultation", name: "სარეაბილიტაციო კონსულტაცია", durationMinutes: 30 },
+  { _id: "exercise", name: "სამკურნალო ფიზკულტურა", durationMinutes: 60 },
+  { _id: "rehabilitation", name: "ფიზიკური რეაბილიტაცია", durationMinutes: 60 },
+];
+const previewSpecialists: Specialist[] = [{ _id: "example", name: "სარეაბილიტაციო სპეციალისტი" }];
+
+export default function BookingWizard({ preview = false }: { preview?: boolean }) {
+  const [services, setServices] = useState<Service[]>(preview ? previewServices : []);
+  const [specialists, setSpecialists] = useState<Specialist[]>(preview ? previewSpecialists : []);
   const [serviceId, setServiceId] = useState("");
   const [specialistId, setSpecialistId] = useState("");
   const [date, setDate] = useState("");
@@ -47,14 +54,20 @@ export default function BookingWizard() {
   const verificationCode = verificationDigits.join("");
 
   useEffect(() => {
+    if (preview) return;
     Promise.all([fetch("/api/services").then((r) => r.json()), fetch("/api/specialists").then((r) => r.json())])
       .then(([a, b]) => { setServices(a.items || []); setSpecialists(b.items || []); })
       .catch(() => setError("მონაცემების ჩატვირთვა ვერ მოხერხდა."));
-  }, []);
+  }, [preview]);
 
   useEffect(() => {
     setTime(""); setSlots([]); setSlotMessage("");
     if (!serviceId || !specialistId || !date) return;
+    if (preview) {
+      setSlots(["10:00", "11:30", "14:00", "15:30"].map((time) => ({ time, available: true })));
+      setSlotMessage("საჩვენებელი საათები");
+      return;
+    }
     const controller = new AbortController();
     setLoadingSlots(true);
     fetch(`/api/availability?date=${encodeURIComponent(date)}&specialistId=${specialistId}&serviceId=${serviceId}`, { signal: controller.signal, cache: "no-store" })
@@ -66,7 +79,7 @@ export default function BookingWizard() {
       .catch((e) => { if (e.name !== "AbortError") setSlotMessage("თავისუფალი დროების ჩატვირთვა ვერ მოხერხდა."); })
       .finally(() => setLoadingSlots(false));
     return () => controller.abort();
-  }, [serviceId, specialistId, date]);
+  }, [serviceId, specialistId, date, preview]);
 
   useEffect(() => {
     if (!confirmation) return;
@@ -151,6 +164,7 @@ export default function BookingWizard() {
   }
 
   async function sendVerificationCode() {
+    if (preview) return;
     setError("");
     setVerificationMessage("");
     if (!/^5\d{8}$/.test(phone)) {
@@ -184,6 +198,7 @@ export default function BookingWizard() {
   }
 
   async function verifyPhone() {
+    if (preview) return;
     setError("");
     setVerificationMessage("");
     if (!/^\d{6}$/.test(verificationCode)) {
@@ -211,7 +226,9 @@ export default function BookingWizard() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setError("");
+    event.preventDefault();
+    if (preview) return;
+    setError("");
     if (!time) return setError("აირჩიეთ თავისუფალი დრო.");
     if (verificationStatus !== "verified" || !verificationToken) return setError("ჯერ დაადასტურეთ ტელეფონის ნომერი SMS კოდით.");
     const form = new FormData(event.currentTarget);
@@ -253,14 +270,16 @@ export default function BookingWizard() {
   return (
     <form className="booking-form booking-form-premium" onSubmit={submit}>
       <div className="premium-booking-head">
-        <div className="premium-booking-head-icon" aria-hidden="true">✓</div>
+        
         <div>
-          <span className="premium-kicker">ონლაინ ჩაწერა</span>
+          
           <h3>ვიზიტის დაჯავშნა</h3>
           <p>შეავსეთ მონაცემები და დაადასტურეთ თქვენი ნომერი SMS კოდით</p>
         </div>
-        <div className="premium-calendar" aria-hidden="true"><span></span><b>▦</b></div>
+        
       </div>
+
+      {preview && <p className="premium-preview-notice">ფორმის ნიმუში. საათები საჩვენებელია, ჯავშანი და SMS არ იგზავნება.</p>}
 
       <section className="premium-step-card">
         <div className="premium-step-head">
@@ -324,7 +343,7 @@ export default function BookingWizard() {
             <span>მობილურის ნომერი</span>
             <div className="premium-control"><i aria-hidden="true">▯</i><input value={phone} onChange={(e) => changePhone(e.target.value)} type="tel" inputMode="numeric" pattern="5[0-9]{8}" maxLength={9} placeholder="5XX XX XX XX" autoComplete="tel" required /></div>
           </label>
-          <button type="button" className="premium-send-code" onClick={sendVerificationCode} disabled={verificationBusy || cooldown > 0 || !/^5\d{8}$/.test(phone) || verificationStatus === "verified"}>
+          <button type="button" className="premium-send-code" onClick={sendVerificationCode} disabled={preview || verificationBusy || cooldown > 0 || !/^5\d{8}$/.test(phone) || verificationStatus === "verified"}>
             <span aria-hidden="true">➤</span>{verificationBusy && verificationStatus === "idle" ? "იგზავნება..." : cooldown > 0 ? `ხელახლა ${cooldown}წმ` : verificationStatus === "sent" ? "კოდის ხელახლა გაგზავნა" : verificationStatus === "verified" ? "ნომერი დადასტურებულია" : "კოდის მიღება"}
           </button>
         </div>
@@ -358,7 +377,7 @@ export default function BookingWizard() {
 
       <input className="honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       {error && <div className="form-error premium-form-error">{error}</div>}
-      <button className="premium-submit" disabled={submitting || !time || verificationStatus !== "verified"}>{submitting ? "მუშავდება..." : verificationStatus !== "verified" ? "ჯერ დაადასტურეთ ნომერი" : "ვიზიტის დაჯავშნა"}<span>→</span></button>
+      <button className="premium-submit" disabled={preview || submitting || !time || verificationStatus !== "verified"}>{submitting ? "მუშავდება..." : verificationStatus !== "verified" ? "ჯერ დაადასტურეთ ნომერი" : "ვიზიტის დაჯავშნა"}<span>→</span></button>
       <p className="premium-privacy">დაჯავშნით ადასტურებთ, რომ მითითებული ნომერი თქვენ გეკუთვნით და ეთანხმებით ვიზიტთან დაკავშირებული SMS შეტყობინებების მიღებას.</p>
     </form>
   );
