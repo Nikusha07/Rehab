@@ -528,7 +528,4 @@
 }
 .menuIcon svg { width: 19px; height: 19px; }
 .menuBooking .menuIcon { background: rgb(255 255 255 / 16%); color: #fff; }
-.entrance img {
-  object-position: center 46%;
-  transform: rotate(-1.2deg) scale(1.055);
-}
+

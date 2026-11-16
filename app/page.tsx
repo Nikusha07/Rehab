@@ -171,7 +171,7 @@ export default async function HomePage() {
             </div>
           </div>
           <a className={styles.entrance} href={maps} target="_blank" rel="noreferrer" aria-label="ცენტრის მდებარეობა რუკაზე">
-            <Image src="/center/rehab1.jpg" alt="რეაბილიტაციის ცენტრის შესასვლელი" fill sizes="(max-width: 760px) 100vw, 50vw" />
+            <Image src="/center/rehab-entrance-v2.jpg" alt="რეაბილიტაციის ცენტრის შესასვლელი" fill sizes="(max-width: 760px) 100vw, 50vw" />
           </a>
         </div>
       </section>
