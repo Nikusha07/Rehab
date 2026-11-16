@@ -16,7 +16,12 @@ export async function GET(request:NextRequest){
  const filter=q?{$or:[{name:{$regex:escaped,$options:"i"}},{phone:{$regex:escaped}},{personalId:{$regex:escaped}}]}:{};
  if (request.nextUrl.searchParams.get("mode") === "booking") {
   if (!hasAdminPermission(auth, "bookings.write")) return NextResponse.json({ ok: false }, { status: 403 });
-  const items = escaped.length < 2 ? [] : await Patient.find({ name: { $regex: escaped, $options: "i" } })
+  const digits = q.replace(/\D/g, "");
+  const phone = digits.length > 9 && digits.startsWith("995") ? digits.slice(3) : digits;
+  const bookingFilter = /^[+\d\s().-]+$/.test(q)
+   ? { phone: phone.length >= 3 && phone.length <= 9 ? { $regex: "^" + phone } : { $in: [] } }
+   : { name: { $regex: escaped, $options: "i" } };
+  const items = q.length < 2 ? [] : await Patient.find(bookingFilter)
    .select("name phone personalId").sort({ name: 1, _id: 1 }).limit(10).lean();
   return NextResponse.json({ ok: true, items }, { headers: { "Cache-Control": "no-store" } });
  }
