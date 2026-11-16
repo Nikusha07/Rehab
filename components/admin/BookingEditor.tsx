@@ -29,6 +29,7 @@ function normalizeTime(value: string) {
   return value;
 }
 
+export type BookingSmsStatus = "sent" | "skipped" | "failed";
 export type BookingDefaults = { date: string; time: string; serviceId?: string; specialistId?: string; patient?: PatientMatch };
 
 export default function BookingEditor({
@@ -42,7 +43,7 @@ export default function BookingEditor({
   booking: EditableBooking | null;
   initial?: BookingDefaults;
   onClose: () => void;
-  onSaved: (date: string) => void;
+  onSaved: (date: string, smsStatus?: BookingSmsStatus) => void;
 }) {
   const [services, setServices] = useState<Service[]>([]);
   const [specialists, setSpecialists] = useState<Specialist[]>([]);
@@ -166,7 +167,7 @@ export default function BookingEditor({
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) return setError(data.message || "შენახვა ვერ მოხერხდა.");
-      onSaved(date);
+      onSaved(date, data.smsStatus);
       onClose();
     } catch {
       setError("კავშირი შეწყდა. ხელახლა ცდამდე გადაამოწმეთ კალენდარი.");
