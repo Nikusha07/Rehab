@@ -15,7 +15,7 @@ export default function PublicHeader() {
   const menu = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const wideScreen = window.matchMedia("(min-width: 761px)");
+    const wideScreen = window.matchMedia("(min-width: 880px)");
     function closeWhenWide() {
       if (wideScreen.matches && menu.current?.open) menu.current.close();
     }

@@ -507,7 +507,7 @@
 
 
 .inlineMenu { display: none; }
-@media (min-width: 761px) {
+@media (min-width: 880px) {
   .burgerToggle { display: none; }
   .inlineMenu {
     display: flex; align-items: center; justify-content: flex-end;
