@@ -505,3 +505,18 @@
   .footerNav { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); }
 }
 
+
+.inlineMenu { display: none; }
+@media (min-width: 761px) {
+  .burgerToggle { display: none; }
+  .inlineMenu {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: clamp(3px, 1.1vw, 14px);
+  }
+  .inlineMenu > a {
+    display: inline-flex; align-items: center; min-height: 44px;
+    white-space: nowrap; padding: 6px clamp(5px, 1vw, 13px);
+    border-radius: 100px; color: #365c55; font-size: 13px; font-weight: 700;
+  }
+  .inlineMenu > a:not(.headerAction):hover { background: #e6f3ee; }
+}
