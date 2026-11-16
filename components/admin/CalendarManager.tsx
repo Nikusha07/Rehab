@@ -2,7 +2,7 @@
 
 import { useEffect,useMemo,useState } from "react";
 import { addDays, nowInTbilisi } from "@/lib/time";
-import BookingEditor, { type BookingDefaults } from "./BookingEditor";
+import BookingEditor, { type BookingDefaults, type BookingSmsStatus } from "./BookingEditor";
 
 type Booking={_id:string;patientName:string;patientPhone:string;date:string;time:string;status:string;confirmationCode:string;patientId?:{_id:string;name:string;phone:string}|null;serviceId?:{_id?:string;name?:string};specialistId?:{_id?:string;name?:string;title?:string}};
 const labels:Record<string,string>={confirmed:"დადასტურებული",completed:"დასრულებული",cancelled:"გაუქმებული",no_show:"არ გამოცხადდა"};
@@ -17,6 +17,7 @@ export default function CalendarManager({ canWrite }: { canWrite: boolean }){
  const [initial,setInitial]=useState<BookingDefaults|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [error,setError]=useState("");
+ const [savedNotice,setSavedNotice]=useState("");
  const start=useMemo(()=>ymd(month.getFullYear(),month.getMonth(),1),[month]);
  const end=useMemo(()=>ymd(month.getFullYear(),month.getMonth(),new Date(month.getFullYear(),month.getMonth()+1,0).getDate()),[month]);
  useEffect(() => {
@@ -44,6 +45,7 @@ export default function CalendarManager({ canWrite }: { canWrite: boolean }){
  function shift(delta:number){const d=new Date(month.getFullYear(),month.getMonth()+delta,1);setMonth(d);setSelected(ymd(d.getFullYear(),d.getMonth(),1))}
  return <>
   <div className="adm-page-head"><div><h1>კალენდარი</h1><p>ჯავშნების თვიური ხედვა — სწრაფად ნახეთ რომელ დღეს რამდენი ვიზიტია დაგეგმილი.</p></div><div className="adm-page-actions"><button className="adm-btn" onClick={()=>shift(-1)}>← წინა</button><button className="adm-btn" onClick={()=>{const d=new Date(`${nowInTbilisi().date}T12:00:00`);setMonth(new Date(d.getFullYear(),d.getMonth(),1));setSelected(ymd(d.getFullYear(),d.getMonth(),d.getDate()))}}>დღეს</button><button className="adm-btn" onClick={()=>shift(1)}>შემდეგი →</button></div></div>
+  {savedNotice && <p role="status" className="adm-notice">{savedNotice}</p>}
   <div className="adm-grid adm-calendar-layout">
    <section className="adm-card adm-calendar-desktop"><div className="adm-card-title"><div><h2>{monthLabel(month)}</h2><p>{loading?"იტვირთება...":`${items.length} ჯავშანი ამ თვეში`}</p></div></div><div className="adm-calendar-scroll"><div className="adm-calendar">{weekdays.map(w=><div className="adm-calendar-head" key={w}>{w}</div>)}{cells.map(c=>{const dayItems=items.filter(x=>x.date===c.date);return <button key={c.date} className={`adm-day ${c.current?"":"muted"}`} style={{textAlign:"left",borderTop:0,borderLeft:0,cursor:"pointer",outline:selected===c.date?"2px solid var(--adm-accent)":"none",outlineOffset:"-2px"}} onClick={()=>{if(!c.current)setMonth(new Date(`${c.date}T12:00:00`));setSelected(c.date)}}><span className="adm-day-number">{c.day}</span><div className="adm-day-events">{dayItems.slice(0,3).map(x=><span key={x._id} className={`adm-event ${x.status}`}>{x.time} • {x.patientName}</span>)}{dayItems.length>3&&<span className="adm-event">+{dayItems.length-3} სხვა</span>}</div></button>})}</div></div></section>
 
@@ -55,6 +57,16 @@ export default function CalendarManager({ canWrite }: { canWrite: boolean }){
    }}>შემდეგი ვიზიტი</button>}</div>)}</div></section>
   </div>
   {error && <p role="alert" className="adm-notice error">{error}</p>}
-  <BookingEditor open={initial !== null} booking={null} initial={initial ?? undefined} onClose={() => setInitial(null)} onSaved={(date) => { setSelected(date); setMonth(new Date(`${date.slice(0, 7)}-01T12:00:00`)); setRefresh((value) => value + 1); }} />
+  <BookingEditor open={initial !== null} booking={null} initial={initial ?? undefined} onClose={() => setInitial(null)} onSaved={(date, smsStatus) => {
+    setSelected(date);
+    setMonth(new Date(`${date.slice(0, 7)}-01T12:00:00`));
+    setRefresh((value) => value + 1);
+    const smsMessages: Record<BookingSmsStatus, string> = {
+      sent: "დადასტურების SMS გაგზავნილია.",
+      skipped: "დადასტურების SMS არ გაგზავნილა: SMS სერვისი არ არის ჩართული.",
+      failed: "დადასტურების SMS ვერ გაიგზავნა.",
+    };
+    setSavedNotice(smsStatus ? `ვიზიტი ჩაიწერა. ${smsMessages[smsStatus]}` : "ვიზიტი ჩაიწერა.");
+  }} />
  </>
 }
