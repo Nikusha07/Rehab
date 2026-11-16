@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import BookingWizard from "@/components/BookingWizard";
 import styles from "./center.module.css";
+import PublicHeader from "@/components/PublicHeader";
 import { getSiteConfig } from "@/lib/site";
 import { dbConnect } from "@/lib/db";
 import Service from "@/models/Service";
@@ -76,18 +77,7 @@ export default async function HomePage() {
   return (
     <main id="top" className={styles.site}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
-      <header className={styles.header}>
-        <div className={styles.wrap + " " + styles.headerRow}>
-          <a className={styles.brand} href="#top">
-            <Image src="/logo-symbol.png" alt="" width={44} height={44} />
-            <span><strong>Reha Sachkhere</strong><small>რეაბილიტაციის ცენტრი</small></span>
-          </a>
-          <nav aria-label="მთავარი მენიუ" className={styles.nav}>
-            <a href="#services">მომსახურება</a><a href="#about">ცენტრის შესახებ</a><a href="#contact">ლოკაცია</a>
-          </nav>
-          <a className={styles.headerAction} href="#booking">ჩაწერა <span aria-hidden="true">↗</span></a>
-        </div>
-      </header>
+      <PublicHeader />
 
       <section className={styles.hero}>
         <div className={styles.wrap + " " + styles.heroGrid}>
@@ -196,7 +186,7 @@ export default async function HomePage() {
             {site.facebook && <a href={site.facebook} target="_blank" rel="noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path fill="currentColor" stroke="none" d="M14 21v-8h2.7l.4-3H14V8.1c0-.9.3-1.5 1.6-1.5h1.7V4a20 20 0 0 0-2.5-.2c-2.5 0-4.2 1.5-4.2 4.3V10H8v3h2.6v8H14Z"/></svg> Facebook</a>}
             {site.instagram && <a href={site.instagram} target="_blank" rel="noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></></svg> Instagram</a>}
             {whatsappHref && <a href={whatsappHref} target="_blank" rel="noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M20 11.5a8 8 0 0 1-8 8 8.2 8.2 0 0 1-3.5-.8L4 20l1.3-4.1A8 8 0 1 1 20 11.5Z"/></svg> WhatsApp</a>}
-            <a href="/admin/login"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></></svg> ადმინისტრაცია</a>
+            <a className={styles.footerAdmin} href="/admin/login"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></></svg> ადმინისტრაცია</a>
           </nav>
         </div>
       </footer>

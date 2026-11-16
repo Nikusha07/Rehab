@@ -405,3 +405,88 @@
   .footerNav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) { .footerNav a { transition: none; } }
+
+.burgerHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 76px;
+}
+.burgerMenu { position: relative; }
+.burgerToggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 46px;
+  height: 46px;
+  list-style: none;
+  border: 1px solid #c5e0d5;
+  border-radius: 14px;
+  background: #e6f3ee;
+  color: #0f3f3b;
+  cursor: pointer;
+}
+.burgerToggle::-webkit-details-marker { display: none; }
+.burgerToggle:focus-visible { outline: 2px solid #156b58; outline-offset: 3px; }
+.burgerToggle span {
+  width: 19px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.burgerMenu[open] .burgerToggle span:first-child { transform: translateY(7px) rotate(45deg); }
+.burgerMenu[open] .burgerToggle span:nth-child(2) { opacity: 0; }
+.burgerMenu[open] .burgerToggle span:last-child { transform: translateY(-7px) rotate(-45deg); }
+.burgerPanel {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  display: grid;
+  gap: 3px;
+  width: min(290px, calc(100vw - 32px));
+  max-height: calc(100dvh - 79px);
+  overflow: auto;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 14px 35px rgb(15 63 59 / 18%);
+}
+.burgerPanel a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.burgerPanel a:hover { background: #e6f3ee; }
+.burgerPanel a:focus-visible { outline-offset: -2px; }
+.burgerPanel a.menuBooking { background: var(--dark); color: #fff; }
+.burgerPanel a.menuBooking:hover { background: #156b58; }
+.site section[id] { scroll-margin-top: 92px; }
+@media (max-width: 760px) {
+  .burgerHeaderRow { min-height: 63px; }
+  .site section[id] { scroll-margin-top: 77px; }
+  .footerNav a.footerAdmin {
+    grid-column: 1 / -1;
+    justify-self: center;
+    justify-content: center;
+    border-color: transparent;
+    background: transparent;
+    color: #b5d0c7;
+    font-size: 11px;
+  }
+  .footerAdmin svg { width: 14px; height: 14px; flex-basis: 14px; }
+}
+@media (min-width: 621px) and (max-width: 760px) {
+  .footerNav { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); }
+}
+@media (prefers-reduced-motion: reduce) { .burgerToggle span { transition: none; } }
