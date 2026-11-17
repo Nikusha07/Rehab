@@ -71,3 +71,61 @@
   .adm-mobile-days{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
   .adm-mobile-day{min-height:60px}
 }
+
+
+/* Keep the selected-day visit cards readable at every desktop width.
+   The patient details must not compete in one flex row with a badge and CTA. */
+.adm-calendar-layout > .adm-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.adm-selected-day .adm-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.adm-selected-day .adm-list-item > div:first-of-type {
+  grid-column: 1 / -1;
+  min-width: 0;
+  width: 100%;
+}
+
+.adm-selected-day .adm-list-item h3,
+.adm-selected-day .adm-list-item p {
+  overflow-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
+}
+
+.adm-selected-day .adm-list-item > .adm-badge {
+  grid-column: 1;
+  justify-self: start;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.adm-selected-day .adm-list-item > .adm-btn {
+  grid-column: 2;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.adm-selected-day .adm-card-title {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 400px) {
+  .adm-selected-day .adm-list-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-selected-day .adm-list-item > .adm-badge,
+  .adm-selected-day .adm-list-item > .adm-btn {
+    grid-column: 1;
+    justify-self: start;
+  }
+}
